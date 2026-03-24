@@ -46,7 +46,7 @@ public class Main {
         String jdbcUrl = args.length > 0 ? args[0] : "jdbc:mysql://localhost:3306/sentence_builder";
         String username = args.length > 1 ? args[1] : "root";
         String password = args.length > 2 ? args[2] : "";
-        String folderPath = args.length > 3 ? args[3] : "C:\\Users\\chris\\Downloads\\sentence-builder-importer-commented\\sentence-builder-importer\\src\\main\\java\\com\\sentencebuilder\\books";
+        String folderPath = args.length > 3 ? args[3] : "src/main/java/com/example/test/books";
         boolean skipAlreadyImported = args.length > 4 ? Boolean.parseBoolean(args[4]) : true;
 
 
