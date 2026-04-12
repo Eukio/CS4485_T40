@@ -2,11 +2,11 @@ package com.example.test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import static java.lang.System.out;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
-import static java.lang.System.*;
 
 import com.example.test.backend.GeneratedSentence;
 import com.example.test.backend.SentenceBuilder;
@@ -30,7 +30,13 @@ import com.example.test.service.BookFolderImporter;
 public class Main {
     private static Properties loadConfig() throws IOException {
         Properties props = new Properties();
-        props.load(new FileInputStream("mysql_config.properties"));
+        try(FileInputStream fis = new FileInputStream("configsql.properties")){
+            props.load(fis);
+        }
+        if(props.getProperty("db.jdbcUrl") == null){
+            throw new RuntimeException("Missing required property: db.jdbcUrl");
+        }
+        //props.load(new FileInputStream("configsql.properties"));
         return props;
     }
 
@@ -39,11 +45,11 @@ public class Main {
         try {
             props = loadConfig();
         } catch (IOException e) {
-            System.err.println("Could not load mysql_config.properties: " + e.getMessage());
+            System.err.println("Could not load configsql.properties: " + e.getMessage());
             return;
         }
 
-        String jdbcUrl = args.length > 0 ? args[0] : props.getProperty("db.url");
+        String jdbcUrl = args.length > 0 ? args[0] : props.getProperty("db.jdbcUrl");
         String username = args.length > 1 ? args[1] : props.getProperty("db.username");
         String password = args.length > 2 ? args[2] : props.getProperty("db.password");
         String folderPath = args.length > 3 ? args[3] : "src/main/java/com/example/test/books";
