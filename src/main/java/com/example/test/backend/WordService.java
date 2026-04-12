@@ -10,12 +10,10 @@ import java.util.List;
 import com.example.test.db.DatabaseManager;
 
 public class WordService{
-    private final DatabaseManager dbManager;
     private final Connection con;
     public WordService(DatabaseManager dbManager){
         /**standard issue connection */
         this.con = dbManager.connection();
-        this.dbManager = dbManager;
     }
 
     @FunctionalInterface
@@ -50,7 +48,7 @@ public class WordService{
     public long getWordId(String word) throws SQLException{
         /** gets the id of a word, if it doesn't exist it creates it and then returns the id. */
         return query("SELECT id FROM words WHERE word = ?", resSet -> {
-            if (resSet.next()){
+            if(resSet.next()){
                 return resSet.getLong("id");
             }
             throw new SQLException("Word not found: " + word);
