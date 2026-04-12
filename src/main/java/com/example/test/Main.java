@@ -70,7 +70,15 @@ public class Main {
 
         // try-with-resources ensures the database connection closes automatically.
         try (DatabaseManager databaseManager = new DatabaseManager(config)) {
-            BookFolderImporter importer = new BookFolderImporter(databaseManager); // hello there
+            BookFolderImporter importer = new BookFolderImporter(
+                databaseManager, 
+                (fileName, currentIndex, totalFiles) -> {
+                    double percent = (currentIndex * 100.0) / totalFiles;
+                    System.out.printf("[%d/%d] (%.2f%%) Importing %s%n", currentIndex, totalFiles, percent, fileName);
+                }); // hello there
+            
+                //code im trying to alter above
+            
             folder = Paths.get(folderPath);
             importer.importFolder(folder, skipAlreadyImported);
             System.out.println("Import completed successfully.");
