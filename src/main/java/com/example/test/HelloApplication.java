@@ -17,7 +17,12 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
+import javafx.event.ActionEvent;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 
+//how do we want to organize module to control FE -> BE data pass
+//import com.example.test.backend.WordService;
 
 import java.io.IOException;
 
@@ -59,6 +64,18 @@ public class HelloApplication extends Application {
         TextField typing = new TextField();
         typing.setPadding(new Insets(10)); //same as Insets(10,10,10,10)
         typing.setBackground(background);
+        //detect if space pressed?
+        typing.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                System.out.println(typing.getText());
+
+            }
+        });
+//        root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+//            if (event.getCode() == KeyCode.SPACE) {
+//                System.out.println("Space detected globally");
+//            }
+//        });
 
         Text typingLabel = new Text("Start typing to see your autocomplete suggestions");
         typingLabel.setFont(Font.font("Verdana", 20)); // Set font family and size
