@@ -38,4 +38,5 @@ build/
 ### Mac OS ###
 .DS_Store
 
-configsql.properties
+mysql_config.properties
+*.class

@@ -1,15 +1,12 @@
 package com.example.test;
 
-import java.io.IOException;
-import static java.lang.System.out;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Properties;
-
 import com.example.test.db.DatabaseConfig;
 import com.example.test.db.DatabaseManager;
 import com.example.test.service.BookFolderImporter;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Program entry point.
@@ -23,7 +20,7 @@ import com.example.test.service.BookFolderImporter;
  * Keeping main() small makes the project easier to test and maintain.
  */
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         // We expect exactly 5 arguments:
         // 0 = JDBC URL
         // 1 = DB username
@@ -44,14 +41,13 @@ public class Main {
         boolean skipAlreadyImported = Boolean.parseBoolean(args[4]);
         */
 
-        Properties props = new Properties();
-        props.load(Files.newInputStream(Paths.get("C:/Users/joshu/Documents/Projects/CSCapstone/CS4485_T40/configsql.properties")));
 
-        String jdbcUrl = args.length > 0 ? args[0] : props.getProperty("db.jdbcUrl");
-        String username = args.length > 1 ? args[1] : props.getProperty("db.username");
-        String password = args.length > 2 ? args[2] : props.getProperty("db.password");
-        String folderPath = args.length > 3 ? args[3] : props.getProperty("db.folderPath");
-        boolean skipAlreadyImported = args.length > 4 ? Boolean.parseBoolean(args[4]) : Boolean.parseBoolean(props.getProperty("db.skipAlreadyImported"));
+
+        String jdbcUrl = args.length > 0 ? args[0] : "jdbc:mysql://localhost:3306/sentence_builder";
+        String username = args.length > 1 ? args[1] : "root";
+        String password = args.length > 2 ? args[2] : "";
+        String folderPath = args.length > 3 ? args[3] : "src/main/java/com/example/test/books";
+        boolean skipAlreadyImported = args.length > 4 ? Boolean.parseBoolean(args[4]) : true;
 
 
         // Stop early if the folder path is invalid.
@@ -67,7 +63,7 @@ public class Main {
 
         // try-with-resources ensures the database connection closes automatically.
         try (DatabaseManager databaseManager = new DatabaseManager(config)) {
-            BookFolderImporter importer = new BookFolderImporter(databaseManager); // hello there
+            BookFolderImporter importer = new BookFolderImporter(databaseManager);
             folder = Paths.get(folderPath);
             importer.importFolder(folder, skipAlreadyImported);
             System.out.println("Import completed successfully.");
@@ -81,12 +77,12 @@ public class Main {
      * Prints the exact command format expected by the program.
      */
     private static void printUsage() {
-        out.println("Usage:");
-        out.println("java -jar sentence-builder-importer-1.0.0-jar-with-dependencies.jar " +
+        System.out.println("Usage:");
+        System.out.println("java -jar sentence-builder-importer-1.0.0-jar-with-dependencies.jar " +
                 "<jdbcUrl> <dbUser> <dbPassword> <folderPath> <skipAlreadyImported>");
-        out.println();
-        out.println("Example:");
-        out.println("java -jar target/sentence-builder-importer-1.0.0-jar-with-dependencies.jar " +
+        System.out.println();
+        System.out.println("Example:");
+        System.out.println("java -jar target/sentence-builder-importer-1.0.0-jar-with-dependencies.jar " +
                 "jdbc:mysql://localhost:3306/sentence_builder root mypassword C:/books true");
     }
 }
