@@ -64,12 +64,13 @@
                 int index = 1;
                 for (Path txtFile : txtFiles) {
                     double percent = (index * 100.0)/ total;
-                    System.out.printf("[%d/%d] (%.2f%%) Importing %s%n", index++, total, percent, txtFile);
+                    System.out.printf("[%d/%d] (%.2f%%) Importing %s%n", index, total, percent, txtFile);
                     if(progressListener != null){
                         progressListener.onProgressUpdate(txtFile.toString(), index, total);
                     }
 
                     importSingleFile(txtFile, skipAlreadyImported);
+                    index++;
                 }
             }
         }
