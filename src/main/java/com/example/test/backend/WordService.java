@@ -17,11 +17,11 @@ public class WordService{
     }
 
     @FunctionalInterface
-    /**This isn't as common or familiar as my other code, so I'll go into deeper detail. 
-     * Basically this helps with reducing the complexity of writing multiple queries. 
-     * Instead of writing the same try with resources block every time, I can just write the query and then handle the result set in a lambda. 
-     * It's a bit more abstract but it reduces boilerplate and makes the code cleaner. 
-     * Plus, it reduces the amount of code I have to write, and I would rather write less than write more. 
+    /**This isn't as common or familiar as my other code, so I'll go into deeper detail.
+     * Basically this helps with reducing the complexity of writing multiple queries.
+     * Instead of writing the same try with resources block every time, I can just write the query and then handle the result set in a lambda.
+     * It's a bit more abstract but it reduces boilerplate and makes the code cleaner.
+     * Plus, it reduces the amount of code I have to write, and I would rather write less than write more.
      * I'm not being paid after all.*/
     private interface ResultSetHandler<T>{
         /** I had to split this off because lambda expressions are annoying*/
@@ -31,16 +31,16 @@ public class WordService{
     private <T> T query(String sql, ResultSetHandler<T> handler, Object... params) throws SQLException{
         /** This guy is the NOT lambda part. It handles all the annoying JDBC stuff.
          * It just throws the query, and then it passes the result set to the lambda to handle.
-         * The lambda handler then throws back whatever type T the lambda cooked up. 
+         * The lambda handler then throws back whatever type T the lambda cooked up.
          * Is it lazy? Probably. But I get to write less code this way.
-        */
+         */
         try(PreparedStatement prepStat = con.prepareStatement(sql)){
             for(int i=0; i<params.length;i++){
                 prepStat.setObject(i+1, params[i]);
             }
             try(ResultSet resSet = prepStat.executeQuery()){
                 return handler.handle(resSet);
-    }}}
+            }}}
 
 
 
@@ -74,13 +74,13 @@ public class WordService{
                 WHERE w1.word_id = ?
                 ORDER BY w1.frequency DESC
                 """;
-                return query(sql, resSet -> {
-                    List<WordCandidate> results = new ArrayList<>();
-                    while(resSet.next()){
-                        results.add(new WordCandidate(resSet.getLong("next_word_id"), resSet.getString("word"), resSet.getLong("frequency")));
-                    }
-                return results;
-            }, wordId);
+        return query(sql, resSet -> {
+            List<WordCandidate> results = new ArrayList<>();
+            while(resSet.next()){
+                results.add(new WordCandidate(resSet.getLong("next_word_id"), resSet.getString("word"), resSet.getLong("frequency")));
+            }
+            return results;
+        }, wordId);
     }
 
     public List<WordCandidate> getPreviousWord(long wordId) throws SQLException{
@@ -92,13 +92,13 @@ public class WordService{
                 WHERE w1.next_word_id = ?
                 ORDER BY w1.frequency DESC
                 """;
-                return query(sql, resSet -> {
-                    List<WordCandidate> results = new ArrayList<>();
-                    while(resSet.next()){
-                        results.add(new WordCandidate(resSet.getLong("word_id"), resSet.getString("word"), resSet.getLong("frequency")));
-                    }
-                return results;
-            }, wordId);
+        return query(sql, resSet -> {
+            List<WordCandidate> results = new ArrayList<>();
+            while(resSet.next()){
+                results.add(new WordCandidate(resSet.getLong("word_id"), resSet.getString("word"), resSet.getLong("frequency")));
+            }
+            return results;
+        }, wordId);
     }
 
     public List<WordCandidate> getAutocompleteCandidates(long wordId, int limit) throws SQLException{
@@ -111,17 +111,17 @@ public class WordService{
                 ORDER BY w1.frequency DESC
                 LIMIT ?
                 """;
-                return query(sql, resSet -> {
-                    List<WordCandidate> results = new ArrayList<>();
-                    while(resSet.next()){
-                        results.add(new WordCandidate(resSet.getLong("next_word_id"), resSet.getString("word"), resSet.getLong("frequency")));
-                    }
-                    return results;
-                }, wordId, limit);
+        return query(sql, resSet -> {
+            List<WordCandidate> results = new ArrayList<>();
+            while(resSet.next()){
+                results.add(new WordCandidate(resSet.getLong("next_word_id"), resSet.getString("word"), resSet.getLong("frequency")));
+            }
+            return results;
+        }, wordId, limit);
 
     }
 
     public boolean wordExists(String word) throws SQLException{
         /** checks if a word exists in the database. */
         return query("SELECT id FROM words WHERE word = ?", resSet -> resSet.next(), word.toLowerCase());
-}}
+    }}

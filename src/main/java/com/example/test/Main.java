@@ -56,7 +56,7 @@ public class Main {
         boolean skipAlreadyImported = args.length > 4 ? Boolean.parseBoolean(args[4]) : true;
 
 
-        
+
         // Stop early if the folder path is invalid.
         Path folder = Paths.get(folderPath);
 
@@ -86,7 +86,7 @@ public class Main {
             System.err.println("Import failed: " + ex.getMessage());
             ex.printStackTrace();
         }
-    
+
         out.println("\n--- Running tests for backend classes ---");
         try (DatabaseManager db = new DatabaseManager(new DatabaseConfig(jdbcUrl, username, password))) {
             testWordService(db);
@@ -96,8 +96,6 @@ public class Main {
             System.err.println("Tests failed: " + e.getMessage());
             e.printStackTrace();
         }
-    
-    
     }
 
     /**
@@ -123,12 +121,12 @@ public class Main {
             out.println("canEnd: " + ws.canEnd(id));
             out.println("canStart: " + ws.canStart(id));
             ws.getNextWord(id).stream().limit(5).forEach(c ->
-                out.println("  next: " + c.word() + " freq: " + c.frequency()));
+                    out.println("  next: " + c.word() + " freq: " + c.frequency()));
             out.println("Yatta! WordService Passed!");
         }catch(Exception e){
             System.err.println("WordService is not daijoubu :( reason: " + e.getMessage());
             e.printStackTrace();
-    }}
+        }}
 
     private static void testSentenceBuilder(DatabaseManager db){
         out.println("\n--- Testing SentenceBuilder.java Wahoo! ---");
@@ -143,16 +141,16 @@ public class Main {
             out.println("Greedy:   " + greedy);
 
             String chained = sb.withMaxLength(10)
-                .markovBuildSentence("the")
-                .markovBuildSentence("the")
-                .result();
+                    .markovBuildSentence("the")
+                    .markovBuildSentence("the")
+                    .result();
             out.println("Chained:  " + chained);
 
             out.println("SentenceBuilder passed. Yay!");
         }catch(Exception e){
             System.err.println("SentenceBuilder fail le. I so disapointed. Reason: " + e.getMessage());
             e.printStackTrace();
-    }}
+        }}
 
     private static void testSentenceHistory(DatabaseManager db){
         out.println("\n--- Testing SentenceHistory.java We like having fun around here ---");
@@ -171,8 +169,8 @@ public class Main {
                 out.println("  [" + gs.algorithm() + "] " + gs.sentence());
             }
 
-                out.println("SentenceHistory passed. We are having fun! :)");
+            out.println("SentenceHistory passed. We are having fun! :)");
         }catch(Exception e){
             System.err.println("SentenceHistory failed. we did not in fact have fun. reason: " + e.getMessage());
             e.printStackTrace();
-}}}
+        }}}
