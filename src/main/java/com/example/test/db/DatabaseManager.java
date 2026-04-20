@@ -8,12 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import com.example.test.backend.WordCandidate;
 
 /**
  * Central database access class.
@@ -236,37 +232,8 @@ public class DatabaseManager implements AutoCloseable {
         }
     }
 
-    public List<WordCandidate> getNextWord(long wordId) throws SQLException{// return a list? (like the datastructure list)
-        String sqlStatement = """
-                SELECT wl.next_word_id, w.word, wl.frequency
-                FROM word_links wl
-                JOIN words w on w.id = wl.next_word_id
-                WHERE wl.word_id = ? 
-                ORDER BY wl.frequency DESC
-                """;
-
-        List<WordCandidate> results = new ArrayList<>();
-        try(PreparedStatement prepStmt = connection.prepareStatement(sqlStatement)){
-            prepStmt.setLong(1, wordId);
-            try(ResultSet rs = prepStmt.executeQuery()){
-                while(rs.next()){
-                    results.add(new WordCandidate(
-                        rs.getLong("next_word_id"),
-                        rs.getString("word"),
-                        rs.getLong("frequency")
-                    ));
-
-                }
-            }
-        
-        
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-        //return a list of the id, word(string) and frequency(as long). 
-        return results;
-        
-    }
+    //Josh
+    
 
     /**
      * Closes the database connection.

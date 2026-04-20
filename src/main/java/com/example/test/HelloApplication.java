@@ -1,38 +1,60 @@
 package com.example.test;
 
+import java.io.IOException;
+import java.util.Properties;
+
+import com.example.test.backend.WordService;
+import com.example.test.db.DatabaseConfig;
+import com.example.test.db.DatabaseManager;
+import com.example.test.util.ConfigLoader;
+
+import com.example.test.backend.GeneratedSentence;
+import com.example.test.backend.SentenceBuilder;
+import com.example.test.backend.SentenceHistory;
+
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.stage.Stage;
-import javafx.scene.text.Text;
-import javafx.scene.control.Label;
-import javafx.scene.text.Font;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.control.TextField;
-import javafx.geometry.Insets;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
-import javafx.event.ActionEvent;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.KeyCode;
-
-//how do we want to organize module to control FE -> BE data pass
-//import com.example.test.backend.WordService;
-
-import java.io.IOException;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 
 public class HelloApplication extends Application {
+    private WordService wordService; 
+    
+
     @Override
     public void start(Stage stage) throws IOException {
 
+        try{
+            Properties props = ConfigLoader.loadConfig();
+
+            DatabaseConfig config = new DatabaseConfig(
+                props.getProperty("db.jdbcUrl"),
+                props.getProperty("db.username"),
+                props.getProperty("db.password")
+            );
+
+            DatabaseManager dbManager = new DatabaseManager(config);
+            wordService = new WordService(dbManager);
+
+        }catch (Exception e){
+            System.err.println("Error initializing database connection: " + e.getMessage());
+            return;
+        }
 
         //VBOX RIGHT SIDE
+        
         Text wordBankTitle = new Text(20, 100, "Next Word");
         wordBankTitle.setFont(Font.font("Verdana", 20)); // Set font family and size
         TextField textField0 = new TextField();
@@ -65,7 +87,7 @@ public class HelloApplication extends Application {
         typing.setPadding(new Insets(10)); //same as Insets(10,10,10,10)
         typing.setBackground(background);
         //detect if space pressed?
-        typing.setOnKeyPressed(event -> {
+        typing.setOnKeyReleased(event -> {
             if (event.getCode() == KeyCode.SPACE) {
                 System.out.println(typing.getText());
 
@@ -88,6 +110,13 @@ public class HelloApplication extends Application {
         generateButton.setPrefSize(200, 60); // sets both width and height
         VBox left = new VBox(welcome0, welcome1 ,typingLabel,typing,generateButton);
         left.setPadding(new Insets(10));
+
+        
+
+
+
+
+
 
 
 

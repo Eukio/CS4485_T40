@@ -15,6 +15,7 @@ import com.example.test.backend.WordService;
 import com.example.test.db.DatabaseConfig;
 import com.example.test.db.DatabaseManager;
 import com.example.test.service.BookFolderImporter;
+import com.example.test.util.ConfigLoader;
 
 /**
  * Program entry point.
@@ -28,22 +29,12 @@ import com.example.test.service.BookFolderImporter;
  * Keeping main() small makes the project easier to test and maintain.
  */
 public class Main {
-    private static Properties loadConfig() throws IOException {
-        Properties props = new Properties();
-        try(FileInputStream fis = new FileInputStream("configsql.properties")){
-            props.load(fis);
-        }
-        if(props.getProperty("db.jdbcUrl") == null){
-            throw new RuntimeException("Missing required property: db.jdbcUrl");
-        }
-        //props.load(new FileInputStream("configsql.properties"));
-        return props;
-    }
+    
 
     public static void main(String[] args) {
         Properties props;
         try {
-            props = loadConfig();
+            props = ConfigLoader.loadConfig();
         } catch (IOException e) {
             System.err.println("Could not load configsql.properties: " + e.getMessage());
             return;
