@@ -438,9 +438,31 @@ public class DatabaseManager implements AutoCloseable {
     /**
      * Simple debug function to print everything about a word.
      */
-    public void printWordDetails(String word) throws SQLException {
+    public String printWordDetails(String word) throws SQLException {
         WordDetails d = getWordDetails(word);
 
+        if (d == null) {
+            return "Word not found: " + word;
+        }
+
+        //full string with all the info to print out in GUI
+        String  fullWordInfo = "";
+
+        fullWordInfo = fullWordInfo +  "WORD: " + d.info.word + "\nTOTAL COUNT: " + d.info.totalCount + "\nSTART COUNT: " + d.info.startCount +
+                "\nEND COUNT: " + d.info.endCount + "\n";
+
+        fullWordInfo = fullWordInfo + "\nNEXT WORDS: \n";
+        for (WordNeighbor w : d.nextWords) {
+            fullWordInfo =  fullWordInfo + w + "\n";
+        }
+
+        fullWordInfo = fullWordInfo + "\nPREVIOUS WORDS: \n";
+        for (WordNeighbor w : d.previousWords) {
+            fullWordInfo =  fullWordInfo + w + "\n";
+        }
+
+        return fullWordInfo;
+        /*
         System.out.println("WORD: " + d.info.word);
         System.out.println("TOTAL COUNT: " + d.info.totalCount);
         System.out.println("START COUNT: " + d.info.startCount);
@@ -455,6 +477,8 @@ public class DatabaseManager implements AutoCloseable {
         for (WordNeighbor w : d.previousWords) {
             System.out.println("  " + w);
         }
+
+         */
     }
 
 

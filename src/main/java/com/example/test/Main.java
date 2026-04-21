@@ -88,7 +88,7 @@ public class Main {
 
         // example to test out for gui later
         try (DatabaseManager db = new DatabaseManager(config)) {
-            db.printWordDetails("the");
+            out.println(db.printWordDetails("the"));
         } catch (Exception e) {
             e.printStackTrace();
         }
