@@ -233,4 +233,231 @@ public class DatabaseManager implements AutoCloseable {
     public void close() throws SQLException {
         connection.close();
     }
+
+
+
+
+    //Christian Verderame
+    //From here I have code to print out the characteristics of a word, such as its count
+    //frquency as a starting or ending word, and the next or previous words to the words you are asking for in
+    //the GUI
+    /**
+     * Holds basic information about a word from the "words" table.
+     */
+    public static class WordInfo {
+        public long id;
+        public String word;
+        public long totalCount;
+        public long startCount;
+        public long endCount;
+        public boolean canStart;
+        public boolean canEnd;
+    }
+
+    /**
+     * Represents a related word (next or previous) and how often it appears.
+     */
+    public static class WordNeighbor {
+        public String word;
+        public long frequency;
+
+        public WordNeighbor(String word, long frequency) {
+            this.word = word;
+            this.frequency = frequency;
+        }
+
+        @Override
+        public String toString() {
+            return word + " (" + frequency + ")";
+        }
+    }
+
+
+    /**
+     * Combines all details about a word:
+     * - its info
+     * - words that come after it
+     * - words that come before it
+     */
+    public static class WordDetails {
+        public WordInfo info;
+        public java.util.List<WordNeighbor> nextWords;
+        public java.util.List<WordNeighbor> previousWords;
+    }
+
+    /**
+     * Finds a word in the database using the TEXT (not id).
+     *
+     * Example:
+     * input = "the"
+     *
+     * This runs:
+     * SELECT * FROM words WHERE word = 'the'
+     */
+    public WordInfo getWordInfo(String word) throws SQLException {
+        String sql = """
+        SELECT id, word, total_count, start_count, end_count, can_start, can_end
+        FROM words
+        WHERE word = ?
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            // Normalize input (lowercase + trim spaces)
+            ps.setString(1, word.toLowerCase().trim());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    WordInfo info = new WordInfo();
+
+                    // Extract values from database row
+                    info.id = rs.getLong("id");
+                    info.word = rs.getString("word");
+                    info.totalCount = rs.getLong("total_count");
+                    info.startCount = rs.getLong("start_count");
+                    info.endCount = rs.getLong("end_count");
+                    info.canStart = rs.getBoolean("can_start");
+                    info.canEnd = rs.getBoolean("can_end");
+
+                    return info;
+                }
+            }
+        }
+
+        // If no match found
+        throw new SQLException("Word not found: " + word);
+    }
+
+
+    /**
+     * Finds all words that come AFTER the given word.
+     *
+     * Example:
+     * "the" → ["cat", "dog", "man"]
+     *
+     * This works by:
+     * 1. Finding the row where word = 'the'
+     * 2. Joining to word_links
+     * 3. Getting the next_word_id
+     * 4. Converting that id back into a word
+     */
+    public java.util.List<WordNeighbor> getNextWords(String word) throws SQLException {
+        String sql = """
+        SELECT w2.word AS next_word, wl.frequency
+        FROM word_links wl
+        JOIN words w1 ON wl.word_id = w1.id
+        JOIN words w2 ON wl.next_word_id = w2.id
+        WHERE w1.word = ?
+        ORDER BY wl.frequency DESC
+        LIMIT 10
+    """;
+
+        java.util.List<WordNeighbor> list = new java.util.ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, word.toLowerCase().trim());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new WordNeighbor(
+                            rs.getString("next_word"),
+                            rs.getLong("frequency")
+                    ));
+                }
+            }
+        }
+
+        return list;
+    }
+
+
+    /**
+     * Finds all words that come BEFORE the given word.
+     *
+     * Example:
+     * "cat" → ["the", "a", "my"]
+     *
+     * This works by reversing the relationship:
+     * Instead of word_id → next_word_id,
+     * we look for rows where next_word_id = current word
+     */
+    public java.util.List<WordNeighbor> getPreviousWords(String word) throws SQLException {
+        String sql = """
+        SELECT w1.word AS prev_word, wl.frequency
+        FROM word_links wl
+        JOIN words w1 ON wl.word_id = w1.id
+        JOIN words w2 ON wl.next_word_id = w2.id
+        WHERE w2.word = ?
+        ORDER BY wl.frequency DESC
+        LIMIT 10
+    """;
+
+        java.util.List<WordNeighbor> list = new java.util.ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, word.toLowerCase().trim());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new WordNeighbor(
+                            rs.getString("prev_word"),
+                            rs.getLong("frequency")
+                    ));
+                }
+            }
+        }
+
+        return list;
+    }
+
+
+    /**
+     * Main function that combines everything.
+     *
+     * Given a word:
+     * - gets its info
+     * - gets next words
+     * - gets previous words
+     */
+    public WordDetails getWordDetails(String word) throws SQLException {
+        WordDetails details = new WordDetails();
+
+        // Basic info about the word
+        details.info = getWordInfo(word);
+
+        // Words that come after
+        details.nextWords = getNextWords(word);
+
+        // Words that come before
+        details.previousWords = getPreviousWords(word);
+
+        return details;
+    }
+
+
+
+    /**
+     * Simple debug function to print everything about a word.
+     */
+    public void printWordDetails(String word) throws SQLException {
+        WordDetails d = getWordDetails(word);
+
+        System.out.println("WORD: " + d.info.word);
+        System.out.println("TOTAL COUNT: " + d.info.totalCount);
+        System.out.println("START COUNT: " + d.info.startCount);
+        System.out.println("END COUNT: " + d.info.endCount);
+
+        System.out.println("\nNEXT WORDS:");
+        for (WordNeighbor w : d.nextWords) {
+            System.out.println("  " + w);
+        }
+
+        System.out.println("\nPREVIOUS WORDS:");
+        for (WordNeighbor w : d.previousWords) {
+            System.out.println("  " + w);
+        }
+    }
+
+
+
+
 }

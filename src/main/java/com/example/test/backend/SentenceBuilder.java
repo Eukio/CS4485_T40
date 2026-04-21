@@ -86,6 +86,10 @@ public class SentenceBuilder{
             String first = words.get(0);
             words.set(0, Character.toUpperCase(first.charAt(0)) + first.substring(1));
             return String.join(" ", words) + ".";
-}}
+    }
+
+
+
+}
 
 
