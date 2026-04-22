@@ -1,5 +1,7 @@
 package com.example.test;
 
+import com.example.test.backend.WordService;
+import com.example.test.db.DatabaseConfig;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
@@ -20,17 +22,48 @@ import javafx.scene.layout.CornerRadii;
 import javafx.event.ActionEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
+import com.example.test.backend.SentenceBuilder;
 
 //how do we want to organize module to control FE -> BE data pass
 //import com.example.test.backend.WordService;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Properties;
+
+import com.example.test.backend.SentenceBuilder;
+
+import static java.lang.System.out;
 
 
 public class HelloApplication extends Application {
+    private static Properties loadConfig() throws IOException {
+        Properties props = new Properties();
+        props.load(new FileInputStream("mysql_config.properties"));
+        return props;
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
 
+        //integrate front w/ backend KADEN START
+        Properties props;
+        try {
+            props = loadConfig();
+        } catch (IOException e) {
+            System.err.println("Could not load mysql_config.properties: " + e.getMessage());
+            return;
+        }
+
+        String jdbcUrl = props.getProperty("db.jdbcUrl");
+        String username = props.getProperty("db.username");
+        String password = props.getProperty("db.password");
+
+        DatabaseConfig config = new DatabaseConfig(jdbcUrl, username, password);
+
+        //integrate front w/ backend KADEN START
+
+        //KADEN START CODE {1}
 
         //VBOX RIGHT SIDE
         Text wordBankTitle = new Text(20, 100, "Next Word");
@@ -68,6 +101,11 @@ public class HelloApplication extends Application {
         typing.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.SPACE) {
                 System.out.println(typing.getText());
+//                WordService ws = new WordService(db);
+//                SentenceBuilder sb = new SentenceBuilder(ws);
+//
+//                String weighted = sb.buildSentence("the", 1);
+//                out.println("Weighted: " + weighted);
 
             }
         });
@@ -98,5 +136,6 @@ public class HelloApplication extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
+        //KADEN END CODE {1}
     }
 }
