@@ -1,6 +1,5 @@
 package com.example.test;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import static java.lang.System.out;
 import java.nio.file.Files;
@@ -8,6 +7,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import com.example.test.backend.BPEMarkovChain;
+import com.example.test.backend.BPETokenizer;
 import com.example.test.backend.GeneratedSentence;
 import com.example.test.backend.SentenceBuilder;
 import com.example.test.backend.SentenceHistory;
@@ -16,13 +17,15 @@ import com.example.test.db.DatabaseConfig;
 import com.example.test.db.DatabaseManager;
 import com.example.test.service.BookFolderImporter;
 import com.example.test.util.ConfigLoader;
+import com.example.test.util.CorpusLoader;
+
 
 /**
  * Program entry point.
  *
  * This class only handles:
  * 1) reading command-line arguments,
- * 2) validating the books folder,
+ * 2) validating the books folder, 
  * 3) creating the database connection layer,
  * 4) launching the folder importer.
  *
@@ -79,11 +82,12 @@ public class Main {
         }
 
         out.println("\n--- Running tests for backend classes ---");
-        try (DatabaseManager db = new DatabaseManager(new DatabaseConfig(jdbcUrl, username, password))) {
+        try(DatabaseManager db = new DatabaseManager(new DatabaseConfig(jdbcUrl, username, password))){
             testWordService(db);
             testSentenceBuilder(db);
             testSentenceHistory(db);
-        } catch (Exception e) {
+            testBPEMarkovChain(db);
+        }catch(Exception e){
             System.err.println("Tests failed: " + e.getMessage());
             e.printStackTrace();
         }
@@ -131,6 +135,12 @@ public class Main {
             String greedy = sb.buildSentence("the", 0);
             out.println("Greedy:   " + greedy);
 
+            String temp = sb.buildSentence("the", 2);
+            out.println("Temperature: " + temp);
+
+            String bpe = sb.withBPE(new BPEMarkovChain(ws, sb), new BPETokenizer().train(CorpusLoader.loadCorpusText(), 500)).buildSentence("the", 3);
+            out.println("BPE Markov: " + bpe);
+
             String chained = sb.withMaxLength(10)
                     .markovBuildSentence("the")
                     .markovBuildSentence("the")
@@ -164,4 +174,26 @@ public class Main {
         }catch(Exception e){
             System.err.println("SentenceHistory failed. we did not in fact have fun. reason: " + e.getMessage());
             e.printStackTrace();
-        }}}
+        }}
+    
+    private static void testBPEMarkovChain(DatabaseManager db){
+        out.println("\n--- Testing BPEMarkovChain.java. I know you said not to. But I gave up my helldiver hours to play around with this. ---");
+        try{
+            String corpus = CorpusLoader.loadCorpusText();
+            out.println("Corpus loaded. Length: " + corpus.length() + " characters");
+
+            BPETokenizer tokenizer = new BPETokenizer().train(corpus, 500);
+            out.println("BPE Tokenizer trained. Vocab size: " + tokenizer.getVocabSize());
+
+            WordService ws = new WordService(db);
+            BPEMarkovChain bpeMarkov = new BPEMarkovChain(ws, new SentenceBuilder(ws));    
+    
+            String bpeSentence = bpeMarkov.buildSentenceBPE("the", tokenizer);
+            out.println("BPE Markov Chain generated sentence: " + bpeSentence);
+            out.println("BPEMarkovChain test completed. I had fun! :)");
+        }catch(Exception e){
+            System.err.println("BPEMarkovChain test failed. Not worth my helldiver hours. reason: " + e.getMessage());
+            e.printStackTrace();
+    }}
+    
+}

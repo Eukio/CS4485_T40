@@ -121,6 +121,17 @@ public class WordService{
 
     }
 
+    public String getWordById(long wordId) throws SQLException{
+        /** Gets a word by its ID. */
+        String sql = "SELECT word FROM words WHERE id = ?";
+        return query(sql, resSet -> {
+            if(resSet.next()){
+                return resSet.getString("word");
+            }
+            throw new SQLException("Word not found: " + wordId);
+        }, wordId);
+    }
+
     public boolean wordExists(String word) throws SQLException{
         /** checks if a word exists in the database. */
         return query("SELECT id FROM words WHERE word = ?", resSet -> resSet.next(), word.toLowerCase());

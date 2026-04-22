@@ -9,6 +9,9 @@ import java.util.Random;
 public class SentenceBuilder{
     private final WordService wordService;
     private final Random rng = new Random();
+    private final int threshold = 15;
+    private BPETokenizer tokenizer = null;
+    private BPEMarkovChain bpeChain = null;
     private String lastSentence="";
     private int maxLength = 50;
 
@@ -30,15 +33,19 @@ public class SentenceBuilder{
         words.add(startingWord.toLowerCase());
 
         for(int i = 0; i < maxLength; i++){
-            if(wordService.canEnd(currentId)) break;
-
             List<WordCandidate> candidates = wordService.getNextWord(currentId);
-            if(candidates.isEmpty()) break;
+            if(candidates.isEmpty()){
+                break;
+            }
+            if(i>=3 && wordService.canEnd(currentId) && candidates.size() < threshold){
+                break;
+            }
 
-            WordCandidate next = switch(algo) {
+            WordCandidate next = switch(algo){
                 case 0 -> greedyPick(candidates);
                 case 1 -> weightedPick(candidates);
-                //case 2 -> out.println("BPE is future me's problem");
+                case 2 -> temperaturePick(candidates, 1.5); // 1.5 is a nice middle ground. Should be fun.
+                case 3 -> bpeChain != null ? bpeChain.pick(candidates, currentId, tokenizer) : weightedPick(candidates);
                 default -> weightedPick(candidates);
             };
 
@@ -50,9 +57,16 @@ public class SentenceBuilder{
         return this.lastSentence;
         }
 
+        public SentenceBuilder withBPE(BPEMarkovChain bpeChain, BPETokenizer tokenizer){
+            /** This is a bit of a hack to avoid circular imports. I want the sentence builder to be able to use the BPEMarkovChain's pick method, but the BPEMarkovChain also needs to use the SentenceBuilder for its markovBuildSentence method. So instead of passing the BPEMarkovChain in the constructor, I just pass it in here. It's not ideal, but it works. */
+            this.bpeChain = bpeChain;
+            this.tokenizer = tokenizer;
+            return this;
+        }
+
         // this is for my own personal gratification. so i can chain markovs like a madman.
         public SentenceBuilder markovBuildSentence(String startingWord) throws SQLException{
-            buildSentence(startingWord, 1);
+            buildSentence(startingWord, 3);
             return this;
         }
 
@@ -60,7 +74,7 @@ public class SentenceBuilder{
             return lastSentence;
         }
 
-        private WordCandidate weightedPick(List<WordCandidate> candidates){
+        protected WordCandidate weightedPick(List<WordCandidate> candidates){
             /** Picks a word based on its frequency. As of now it's a simple weighted random selection */
             long total = candidates.stream().mapToLong(WordCandidate::frequency).sum();
             long roll = (long)(rng.nextDouble() * total);
@@ -73,12 +87,26 @@ public class SentenceBuilder{
             return candidates.get(candidates.size() - 1);
         }
 
-        private WordCandidate greedyPick(List<WordCandidate> candidates){
+        protected WordCandidate greedyPick(List<WordCandidate> candidates){
             /** Just picks the most frequent word. Literal biblical levels of greed. This is the greed talked about in revelations. */
             return candidates.get(0);
         }
 
-        private String format(List<String> words){
+        protected WordCandidate temperaturePick(List<WordCandidate> candidates, double temperature){
+            // Got bored. Temperature scaling is pretty easy - just scale frequencies by a set temperature. 
+            // that's a lie. I stole this from my ML class notes. 
+            double total = candidates.stream().mapToDouble(c -> Math.pow(c.frequency(), 1.0 / temperature)).sum();
+            double roll = rng.nextDouble() * total;
+            double cumulative = 0;
+            
+            for(WordCandidate candidate : candidates){
+                cumulative += Math.pow(candidate.frequency(), 1.0 / temperature);
+                if(roll < cumulative) return candidate;
+            }
+            return candidates.get(candidates.size() - 1);
+        }
+
+        protected String format(List<String> words){
             /** Formats the list of words into a sentence */
             if(words.isEmpty()){
                 return "";
