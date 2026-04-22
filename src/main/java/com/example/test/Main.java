@@ -34,6 +34,8 @@ public class Main {
         return props;
     }
 
+
+
     public static void main(String[] args) {
         Properties props;
         try {
@@ -82,7 +84,19 @@ public class Main {
             System.err.println("Tests failed: " + e.getMessage());
             e.printStackTrace();
         }
+
+
+        // example to test out for gui later
+        try (DatabaseManager db = new DatabaseManager(config)) {
+            out.println(db.printWordDetails("the"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
+
+
+
 
     /**
      * Prints the exact command format expected by the program.
@@ -138,9 +152,9 @@ public class Main {
             e.printStackTrace();
         }}
 
-    private static void testSentenceHistory(DatabaseManager db){
+    private static void testSentenceHistory(DatabaseManager db) {
         out.println("\n--- Testing SentenceHistory.java We like having fun around here ---");
-        try{
+        try {
             SentenceHistory sh = new SentenceHistory(db);
 
             sh.save("Annie said meow", "weighted");
@@ -156,7 +170,15 @@ public class Main {
             }
 
             out.println("SentenceHistory passed. We are having fun! :)");
-        }catch(Exception e){
+        } catch (Exception e) {
             System.err.println("SentenceHistory failed. we did not in fact have fun. reason: " + e.getMessage());
             e.printStackTrace();
-        }}}
+        }
+
+
+    }
+
+
+
+
+}
