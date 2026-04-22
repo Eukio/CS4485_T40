@@ -29,13 +29,16 @@
 
     public class BookFolderImporter {
         private final DatabaseManager databaseManager;
+        private final ImportProgressListener progressListener;
+        
         
         //[EDIT]: added globals for the special tokens to avoid hardcoding them in multiple places and being a hassle. Also to make it easier to change them in the future if needed.
         private static final String SENTENCE_BEGIN = "[BEGIN]";
         private static final String SENTENCE_END = "[END]";
 
-        public BookFolderImporter(DatabaseManager databaseManager) {
+        public BookFolderImporter(DatabaseManager databaseManager, ImportProgressListener progressListener) {
             this.databaseManager = databaseManager;
+            this.progressListener = progressListener;
         }
 
         /**
@@ -57,10 +60,17 @@
                     return;
                 }
 
+                int total = txtFiles.size();
                 int index = 1;
                 for (Path txtFile : txtFiles) {
-                    System.out.printf("[%d/%d] Importing %s%n", index++, txtFiles.size(), txtFile);
+                    double percent = (index * 100.0)/ total;
+                    System.out.printf("[%d/%d] (%.2f%%) Importing %s%n", index, total, percent, txtFile);
+                    if(progressListener != null){
+                        progressListener.onProgressUpdate(txtFile.toString(), index, total);
+                    }
+
                     importSingleFile(txtFile, skipAlreadyImported);
+                    index++;
                 }
             }
         }
