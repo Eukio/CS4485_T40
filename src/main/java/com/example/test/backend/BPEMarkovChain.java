@@ -71,8 +71,6 @@ public class BPEMarkovChain{
         words.add(startingWord.toLowerCase());
 
         long currentId = wordService.getWordId(startingWord.toLowerCase());
-        // long previousId = currentId;// start off with the same word, marked as starting.
-
         for(int i=0;i<maxLength;i++){
             if(wordService.canEnd(currentId)){
                 break;
