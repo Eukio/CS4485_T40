@@ -4,4 +4,4 @@
 package com.example.test.backend;
 import java.time.LocalDateTime;
 
-public record GeneratedSentence(long id, String sentence, String algorithm, LocalDateTime generatedAt) {}
+public record GeneratedSentence(long id, String sentence, String algorithm, LocalDateTime generatedAt){}

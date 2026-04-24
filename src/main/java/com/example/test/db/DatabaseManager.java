@@ -1,6 +1,12 @@
 package com.example.test.db;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -225,6 +231,9 @@ public class DatabaseManager implements AutoCloseable {
         } catch (SQLException ignored) {
         }
     }
+
+    //Josh
+    
 
     /**
      * Closes the database connection.
