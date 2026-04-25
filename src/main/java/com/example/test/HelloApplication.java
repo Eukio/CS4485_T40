@@ -23,7 +23,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
-import javafx.beans.binding.Bindings;
 import javafx.scene.Scene;
 import javafx.scene.Group;
 
@@ -44,14 +43,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import javafx.stage.Stage;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.geometry.Insets;
-import javafx.stage.Stage;
-import javafx.scene.control.TextArea;
+
+import javafx.application.Platform;
 
 
 
@@ -190,29 +183,35 @@ public class HelloApplication extends Application {
 
         importScene = new Scene(pane, 800, 320);
     }
-    public ScrollPane createRightWordBank(TextField[] suggestionFields) throws IOException{
-        //VBOX RIGHT SIDE
+    public ScrollPane createRightWordBank(Button[] suggestionFields) throws IOException {
         Text wordBankTitle = new Text(20, 100, "Next Word");
-        wordBankTitle.setFont(Font.font("Verdana", 20)); // Set font family and size
+        wordBankTitle.setFont(Font.font("Verdana", 20));
 
-        for(int i=0;i<suggestions;i++){
-            suggestionFields[i] = new TextField();
-            suggestionFields[i].setEditable(false);
+        Color color2 = Color.web("#4e60ba");
+        CornerRadii radii = new CornerRadii(10);
+
+        for (int i = 0; i < suggestions; i++) {
+            suggestionFields[i] = new Button();
+            suggestionFields[i].setVisible(false); // hide until populated
+            suggestionFields[i].setPrefWidth(160);
+
+            BackgroundFill bf = new BackgroundFill(color2, radii, new Insets(4));
+            suggestionFields[i].setBackground(new Background(bf));
+            suggestionFields[i].setTextFill(Color.WHITE);
         }
 
-        //word bank on right side
         VBox wordBank = new VBox(wordBankTitle);
         wordBank.getChildren().addAll(suggestionFields);
         wordBank.setSpacing(10);
-        wordBank.setPadding(new Insets(10)); //Insets are just padding, can also do 4 arg
+        wordBank.setPadding(new Insets(10));
 
         Color color = Color.web("#c1c8e6");
-        CornerRadii radii = new CornerRadii(10);
-        BackgroundFill backgroundFill = new BackgroundFill(color, radii, Insets.EMPTY);
-        Background background = new Background(backgroundFill);
-        wordBank.setBackground(background);
+        BackgroundFill backgroundFill = new BackgroundFill(color, new CornerRadii(10), Insets.EMPTY);
+        wordBank.setBackground(new Background(backgroundFill));
+
         return new ScrollPane(wordBank);
     }
+
     public VBox createLeftVBox(Button algoButton, Button generateButton, TextField typing) throws IOException{
         Text welcome0 = new Text("Welcome to_");
         Text welcome1 = new Text("Sentence Builder");
@@ -306,7 +305,7 @@ public class HelloApplication extends Application {
 
     }
     public void setWordGeneratorScene() throws IOException {
-        TextField[] suggestionFields = new TextField[suggestions];
+        Button[] suggestionFields = new Button[suggestions]; // change to a button instead of textfield
         Button algoButton = new Button("Algorithm: Greedy"); // expect a lot of mention of whale.
         Button generateButton = new Button("Generate Sentence");
         Button toImportSceneButton = new Button("<-");
@@ -330,7 +329,7 @@ public class HelloApplication extends Application {
             if(!text.isEmpty()){
                 String lastWord = text.contains(" ") ?
                     text.substring(text.lastIndexOf(" ") + 1) : text;
-                updateWordBank(lastWord, suggestionFields);
+                updateWordBank(lastWord, suggestionFields, typing);
         }});
 
         generateButton.setOnAction(event -> {
@@ -358,7 +357,7 @@ public class HelloApplication extends Application {
                     return;
                 }
                 String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
-                updateWordBank(lastWord, suggestionFields);
+                updateWordBank(lastWord, suggestionFields, typing);
         }});
 
         //try hbox as grid
@@ -379,14 +378,37 @@ public class HelloApplication extends Application {
         wordGeneratorScene = new Scene(pane, 800, 320); //height, width
     }
 
-    private void updateWordBank(String lastWord, TextField[] suggestionFields){
-        // Standard issue helper function -Joshua John
-        try{
-            if(wordService.wordExists(lastWord)){
+    private void updateWordBank(String lastWord, Button[] suggestionFields, TextField typing) {
+        try {
+            if (wordService.wordExists(lastWord)) {
                 long id = wordService.getWordId(lastWord);
                 var candidates = wordService.getAutocompleteCandidates(id, suggestions);
-                for(int i=0;i<suggestionFields.length;i++){
-                    suggestionFields[i].setText(i < candidates.size() ? candidates.get(i).word() : "");
-                }}}catch (Exception e){
-                System.err.println("Error fetching autocomplete candidates: " + e.getMessage());
-}}}
+                for (int i = 0; i < suggestionFields.length; i++) {
+                    if (i < candidates.size()) {
+                        String word = candidates.get(i).word();
+                        suggestionFields[i].setText(word);
+                        suggestionFields[i].setVisible(true);
+                        suggestionFields[i].setOnAction(e -> {
+                            String current = typing.getText();
+                            if (current.contains(" ")) {
+                                typing.setText(current.substring(0, current.lastIndexOf(" ") + 1) + word);
+                            } else {
+                                typing.setText(word);
+                            }
+                            Platform.runLater(() -> {
+                                typing.positionCaret(typing.getText().length());
+                                typing.requestFocus();
+                                typing.positionCaret(typing.getText().length());
+                            });
+                        });
+                    } else {
+                        suggestionFields[i].setText("");
+                        suggestionFields[i].setVisible(false);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching autocomplete candidates: " + e.getMessage());
+        }
+    }
+}
