@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.example.test.db.DatabaseManager;
 
@@ -27,6 +29,12 @@ public class WordService{
         /** I had to split this off because lambda expressions are annoying*/
         T handle(ResultSet resSet) throws SQLException;
     }
+
+    private record AutoCompleteKey(long wordId, int limit){};
+
+    private final Map<AutoCompleteKey, List<WordCandidate>> autocompleteCache = new ConcurrentHashMap<>();
+
+    
 
     private <T> T query(String sql, ResultSetHandler<T> handler, Object... params) throws SQLException{
         /** This guy is the NOT lambda part. It handles all the annoying JDBC stuff.
@@ -103,6 +111,13 @@ public class WordService{
 
     public List<WordCandidate> getAutocompleteCandidates(long wordId, int limit) throws SQLException{
         /** Gets autocomplete candidates based on a prefix */
+        AutoCompleteKey key = new AutoCompleteKey(wordId, limit);
+
+        if (autocompleteCache.containsKey(key)) {
+            System.out.println("CACHE HIT: " + key);
+            return autocompleteCache.get(key);
+        }
+        
         String sql = """
                 SELECT w1.next_word_id, w.word, w1.frequency
                 FROM word_links w1
@@ -111,14 +126,32 @@ public class WordService{
                 ORDER BY w1.frequency DESC
                 LIMIT ?
                 """;
-        return query(sql, resSet -> {
+        List<WordCandidate> result = query(sql, resSet -> {
             List<WordCandidate> results = new ArrayList<>();
             while(resSet.next()){
-                results.add(new WordCandidate(resSet.getLong("next_word_id"), resSet.getString("word"), resSet.getLong("frequency")));
+                results.add(new WordCandidate(
+                    resSet.getLong("next_word_id"),
+                    resSet.getString("word"),
+                    resSet.getLong("frequency")
+                ));
             }
             return results;
         }, wordId, limit);
 
+        System.out.println("CACHE MISS: " + key);
+        autocompleteCache.put(key, result);
+        return result;
+    }
+
+    public String getWordById(long wordId) throws SQLException{
+        /** Gets a word by its ID. */
+        String sql = "SELECT word FROM words WHERE id = ?";
+        return query(sql, resSet -> {
+            if(resSet.next()){
+                return resSet.getString("word");
+            }
+            throw new SQLException("Word not found: " + wordId);
+        }, wordId);
     }
 
     public boolean wordExists(String word) throws SQLException{
