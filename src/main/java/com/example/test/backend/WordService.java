@@ -182,12 +182,15 @@ public class WordService{
                         """;
                 try (PreparedStatement pstmt = con.prepareStatement(sql)) {
                     // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
+                    pstmt.setString(1, prev);
+                    pstmt.setString(2, curr);
                     int numUpdate = pstmt.executeUpdate();
 
                     if (numUpdate == 0) {
                         System.out.println(prev + " then " + curr);
                     }
                 }
+                System.out.println("added " + prev + "->" + curr);
             }else { //update link Count
                 String sql = """
                     UPDATE word_links w1
@@ -196,12 +199,15 @@ public class WordService{
                 """;
                 try (PreparedStatement pstmt = con.prepareStatement(sql)) {
                     // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
+                    pstmt.setLong(1, getWordId(prev));
+                    pstmt.setLong(2, getWordId(curr));
                     int numUpdate = pstmt.executeUpdate();
 
                     if (numUpdate == 0) {
                         System.out.println(prev + " then " + curr);
                     }
                 }
+                System.out.println("incremented " + prev + "->" + curr);
             }
     }
 }
