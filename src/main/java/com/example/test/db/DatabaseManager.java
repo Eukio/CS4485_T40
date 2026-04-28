@@ -490,6 +490,39 @@ public class DatabaseManager implements AutoCloseable {
          */
     }
 
+    //Christian Verderame
+    /**
+     * Returns all file stats as a formatted string (for GUI display).
+     */
+    public String getAllFilesStatsString() throws SQLException {
+        String sql = """
+        SELECT f.id, f.filename,
+               COUNT(wfc.word_id) AS unique_words,
+               COALESCE(SUM(wfc.count_in_file), 0) AS total_words
+        FROM imported_files f
+        LEFT JOIN word_file_counts wfc ON f.id = wfc.file_id
+        GROUP BY f.id, f.filename
+        ORDER BY f.filename
+    """;
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("=== FILES IN DATABASE ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                sb.append("File ID: ").append(rs.getLong("id")).append("\n");
+                sb.append("Name: ").append(rs.getString("filename")).append("\n");
+                sb.append("Total Words: ").append(rs.getLong("total_words")).append("\n");
+                sb.append("Unique Words: ").append(rs.getLong("unique_words")).append("\n");
+                sb.append("------------------------\n");
+            }
+        }
+
+        return sb.toString();
+    }
 
 
 

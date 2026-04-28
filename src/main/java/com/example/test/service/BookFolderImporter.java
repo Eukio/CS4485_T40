@@ -233,4 +233,10 @@
          */
         private record WordPair(String currentWord, String nextWord) {
         }
+
+        //Christian Verderame
+        //import file used to import txt file by user
+        public void importFile(Path txtFile, boolean skipAlreadyImported) throws Exception {
+            importSingleFile(txtFile, skipAlreadyImported);
+        }
     }

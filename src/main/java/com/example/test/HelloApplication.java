@@ -47,6 +47,9 @@ import javafx.stage.Stage;
 import javafx.application.Platform;
 
 
+import javafx.stage.FileChooser;
+import java.io.File;
+import com.example.test.service.BookFolderImporter;
 
 
 public class HelloApplication extends Application {
@@ -125,13 +128,53 @@ public class HelloApplication extends Application {
         welcome1.setFill(color2);
         CornerRadii radii = new CornerRadii(10);
 
-        Text uploadLabel = new Text("Upload your text file here!");
+        //Text uploadLabel = new Text("Upload your text file here!");
+        Label uploadLabel = new Label("Upload your text file here!");
         uploadLabel.setFont(Font.font("Verdana", 20)); // Set font family and size
 
         //Import file Button
         Button importFileButton = new Button("Click Here");
         //importFileButton.setOnAction(e -> ); TODO: Go to Import files
-        importFileButton.setTextFill(color5);
+        //importFileButton.setTextFill(color5);
+
+        //Christian verderame
+        //feature to import txt files from users into the database
+        importFileButton.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose a text file");
+
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Text Files", "*.txt")
+            );
+
+            File selectedFile = fileChooser.showOpenDialog(window);
+
+            if (selectedFile != null) {
+                try {
+                    Properties props = ConfigLoader.loadConfig();
+
+                    String jdbcUrl = props.getProperty("db.jdbcUrl");
+                    String username = props.getProperty("db.username");
+                    String password = props.getProperty("db.password");
+                    boolean skipAlready = Boolean.parseBoolean(props.getProperty("db.skipAlready"));
+
+                    DatabaseConfig config = new DatabaseConfig(jdbcUrl, username, password);
+
+                    try (DatabaseManager db = new DatabaseManager(config)) {
+                        BookFolderImporter importer = new BookFolderImporter(db, null);
+
+                        importer.importFile(selectedFile.toPath(), skipAlready);
+                    }
+
+                    uploadLabel.setText("File imported successfully!");
+
+                } catch (Exception ex) {
+                    uploadLabel.setText("Import failed: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+        });
+
 
         BorderStroke outerStroke = new BorderStroke(
                 Color.BLACK,
