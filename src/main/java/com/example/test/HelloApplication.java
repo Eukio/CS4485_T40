@@ -429,14 +429,15 @@ public class HelloApplication extends Application {
                 for (int i = 0; i < suggestionFields.length; i++) {
                     if (i < candidates.size()) {
                         String word = candidates.get(i).word();
-                        suggestionFields[i].setText(word);
+                        String displayWord = word.equals("[END]") ? "." : word;
+                        suggestionFields[i].setText(displayWord);
                         suggestionFields[i].setVisible(true);
                         suggestionFields[i].setOnAction(e -> {
                             String current = typing.getText();
                             if (current.contains(" ")) {
-                                typing.setText(current.substring(0, current.lastIndexOf(" ") + 1) + word);
+                                typing.setText(current.substring(0, current.lastIndexOf(" ") + 1) + displayWord);
                             } else {
-                                typing.setText(word);
+                                typing.setText(displayWord);
                             }
                             Platform.runLater(() -> {
                                 typing.positionCaret(typing.getText().length());
