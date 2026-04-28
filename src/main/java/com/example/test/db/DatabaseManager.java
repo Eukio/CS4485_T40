@@ -524,6 +524,9 @@ public class DatabaseManager implements AutoCloseable {
         return sb.toString();
     }
 
+//TODO: String that sees a list of all words in the system and information about them
+
+//TODO: Keep track of what sentences have been generated so your user can look for duplicates
 
 
 }

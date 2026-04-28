@@ -1,6 +1,7 @@
 package com.example.test;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import static java.lang.System.out;
@@ -18,22 +19,18 @@ import com.example.test.util.ConfigLoader;
 import com.example.test.util.CorpusLoader;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 import javafx.scene.Scene;
-import javafx.scene.Group;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 
 import javafx.scene.layout.*;
 
@@ -70,7 +67,7 @@ public class HelloApplication extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) throws IOException, SQLException {
         configDatabase();
         createWindow(primaryStage);
     }
@@ -100,7 +97,7 @@ public class HelloApplication extends Application {
 
     }
 
-    public void createWindow(Stage primaryStage) throws IOException{
+    public void createWindow(Stage primaryStage) throws IOException, SQLException {
         window = primaryStage;
         //Eucharist Tan
         setImportScene();
@@ -255,7 +252,7 @@ public class HelloApplication extends Application {
         return new ScrollPane(wordBank);
     }
 
-    public VBox createLeftVBox(Button algoButton, Button generateButton, TextField typing) throws IOException{
+    public VBox createLeftVBox(Button algoButton, Button generateButton, TextArea typing) throws IOException{
         Text welcome0 = new Text("Welcome to_");
         Text welcome1 = new Text("Sentence Builder");
         createLeftVBoxText(welcome0,welcome1);
@@ -277,7 +274,7 @@ public class HelloApplication extends Application {
         welcome1.setFont(Font.font("Verdana", 50)); // Set font family and size
         welcome1.setFill(color2);
     }
-    public void createTextFieldTyping(TextField typing, Text typingLabel) throws IOException{
+    public void createTextFieldTyping(TextArea typing, Text typingLabel) throws IOException{
 
         typing.setPadding(new Insets(10)); //same as Insets(10,10,10,10)
         Color color = Color.web("#c1c8e6");
@@ -323,18 +320,58 @@ public class HelloApplication extends Application {
 
         buttons.setSpacing(10);
     }
-    public TextArea createTextArea() throws IOException{
+    public void createTextArea(TextArea textArea) throws IOException{
         Color color = Color.web("#c1c8e6");
         CornerRadii radii = new CornerRadii(10);
         BackgroundFill backgroundFill = new BackgroundFill(color, radii, Insets.EMPTY);
         Background background = new Background(backgroundFill);
-        TextArea outputTextArea = new TextArea();
-        outputTextArea.setPrefRowCount(10);
-        outputTextArea.setPrefColumnCount(30);
-        outputTextArea.setWrapText(true);
-        outputTextArea.setPadding(new Insets(10)); //same as Insets(10,10,10,10)
-        outputTextArea.setBackground(background);
-        return outputTextArea;
+        textArea.setPrefRowCount(10);
+        textArea.setPrefColumnCount(30);
+        textArea.setWrapText(true);
+        textArea.setPadding(new Insets(10)); //same as Insets(10,10,10,10)
+        textArea.setBackground(background);
+    }
+    /*
+     //TODO: Make this similar to WordBank, allow refresh, but create a word details button, half screen of reporting info
+    public ScrollPane setReportBox(Button[] suggestionFields, String word) throws SQLException {
+        Text reportBoxtTitle = new Text(20, 100, "");
+        wordBankTitle.setFont(Font.font("Verdana", 20));
+
+        Color color2 = Color.web("#4e60ba");
+        CornerRadii radii = new CornerRadii(10);
+
+        for (int i = 0; i < suggestions; i++) {
+            suggestionFields[i] = new Button();
+            DatabaseManager.WordDetails selectedWordDetail = dbManager.getWordDetails(word);
+            suggestionFields[i].setVisible(false); // hide until populated
+            suggestionFields[i].setPrefWidth(160);
+            BackgroundFill bf = new BackgroundFill(color2, radii, new Insets(4));
+            suggestionFields[i].setBackground(new Background(bf));
+            suggestionFields[i].setTextFill(Color.WHITE);
+        }
+
+        ScrollPane reportDetails = new ScrollPane(wordBankTitle);
+        reportDetails.getChildren().addAll(suggestionFields);
+        reportDetails.setSpacing(10);
+        reportDetails.setPadding(new Insets(10));
+
+        Color color = Color.web("#c1c8e6");
+        BackgroundFill backgroundFill = new BackgroundFill(color, new CornerRadii(10), Insets.EMPTY);
+        reportDetails.setBackground(new Background(backgroundFill));
+
+        return new ScrollPane(reportDetails);
+
+    }
+
+
+     */
+
+
+    //TODO: Actual reporting here
+    public void setReportTextArea(TextArea textArea, String word) throws SQLException {
+       // DatabaseManager.WordDetails selectedWord = dbManager.getWordDetails(word);
+        textArea.setText(dbManager.printWordDetails(word));
+
     }
     public void createToImportSceneButton(Button toImportSceneButton) throws IOException{
         Color color3 = Color.web("#00000040"); //Continue Button
@@ -347,12 +384,13 @@ public class HelloApplication extends Application {
         toImportSceneButton.setPrefSize(60, 60); // sets both width and height
 
     }
-    public void setWordGeneratorScene() throws IOException {
+    public void setWordGeneratorScene() throws IOException, SQLException {
         Button[] suggestionFields = new Button[suggestions]; // change to a button instead of textfield
         Button algoButton = new Button("Algorithm: Greedy"); // expect a lot of mention of whale.
         Button generateButton = new Button("Generate Sentence");
         Button toImportSceneButton = new Button("<-");
-        TextField typing = new TextField();
+        TextArea typing = new TextArea();
+        createTextArea(typing);
         createToImportSceneButton(toImportSceneButton);
         ScrollPane wordBankScroll= createRightWordBank(suggestionFields);
         wordBankScroll.setFitToWidth(true);
@@ -361,7 +399,8 @@ public class HelloApplication extends Application {
         VBox left = createLeftVBox(algoButton, generateButton,typing);
         left.setPadding(new Insets(10));
 
-        TextArea outputTextArea = createTextArea();
+        TextArea reportTextArea = new TextArea();
+        createTextArea(reportTextArea);
 
         int maxAlgo = 4; //placeholder for number of algorithms
         int[] algorithmOptions = {0};
@@ -372,7 +411,7 @@ public class HelloApplication extends Application {
             if(!text.isEmpty()){
                 String lastWord = text.contains(" ") ?
                     text.substring(text.lastIndexOf(" ") + 1) : text;
-                updateWordBank(lastWord, suggestionFields, typing);
+                updateWordBank(lastWord, suggestionFields, typing,reportTextArea);
         }});
 
         generateButton.setOnAction(event -> {
@@ -400,18 +439,18 @@ public class HelloApplication extends Application {
                     return;
                 }
                 String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
-                updateWordBank(lastWord, suggestionFields, typing);
+                updateWordBank(lastWord, suggestionFields, typing, reportTextArea);
         }});
 
         //try hbox as grid
         Label mainLabel = new Label("CS4485_Team40");
-        HBox app = new HBox(toImportSceneButton, left, wordBankScroll, outputTextArea, mainLabel);
+        HBox app = new HBox(toImportSceneButton, left, wordBankScroll, reportTextArea, mainLabel);
         app.setAlignment(Pos.CENTER_LEFT);;
 
         BorderPane pane = new BorderPane();
         pane.setCenter(app);
         pane.setRight(wordBankScroll);
-        pane.setBottom(outputTextArea);
+        pane.setBottom(reportTextArea);
 
         pane.setTop(mainLabel);
 
@@ -421,7 +460,7 @@ public class HelloApplication extends Application {
         wordGeneratorScene = new Scene(pane, 800, 320); //height, width
     }
 
-    private void updateWordBank(String lastWord, Button[] suggestionFields, TextField typing) {
+    private void updateWordBank(String lastWord, Button[] suggestionFields, TextArea typing, TextArea reportTextArea) {
         try {
             if (wordService.wordExists(lastWord)) {
                 long id = wordService.getWordId(lastWord);
@@ -435,7 +474,18 @@ public class HelloApplication extends Application {
                             String current = typing.getText();
                             if (current.contains(" ")) {
                                 typing.setText(current.substring(0, current.lastIndexOf(" ") + 1) + word);
+                                try {
+                                    setReportTextArea(reportTextArea,"string"); //TODO: Temporary to see word Details
+                                } catch (SQLException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+
                             } else {
+                                try {
+                                    setReportTextArea(reportTextArea,"string"); //TODO: Temporary to see word Details
+                                } catch (SQLException ex) {
+                                    throw new RuntimeException(ex);
+                                }
                                 typing.setText(word);
                             }
                             Platform.runLater(() -> {
