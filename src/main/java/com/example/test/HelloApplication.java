@@ -361,7 +361,7 @@ public class HelloApplication extends Application {
         VBox left = createLeftVBox(algoButton, generateButton,typing);
         left.setPadding(new Insets(10));
 
-        TextArea outputTextArea = createTextArea();
+       TextArea outputTextArea = createTextArea();
 
         int maxAlgo = 4; //placeholder for number of algorithms
         int[] algorithmOptions = {0};
@@ -376,21 +376,35 @@ public class HelloApplication extends Application {
         }});
 
         generateButton.setOnAction(event -> {
-            /** Should grab the current text from the typing field, then saves it to the sentence history */
             String text = typing.getText().trim();
-            if(text.isEmpty()){
-                return;
-            }try{
-                String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
+            try {
+                // Strip trailing [END] or punctuation left over from previous generation
+                String cleaned = text.replaceAll("\\s*\\[END\\]\\.?$", "").replaceAll("[.!?]+$", "").trim();
+
+                String lastWord = cleaned.isEmpty() ? null
+                        : cleaned.contains(" ") ? cleaned.substring(cleaned.lastIndexOf(" ") + 1).trim()
+                        : cleaned;
+
                 out.println("Using algorithm: " + algorithmOptions[0]);
                 String sentence = new SentenceBuilder(wordService).buildSentence(lastWord, algorithmOptions[0]);
                 out.println("Generated sentence: " + sentence);
-                typing.setText(sentence);
+
+                //edited so that it doesn't replace all the text
+                String current = typing.getText().trim();
+                typing.setText(current.isEmpty() ? sentence : current + " " + sentence);
+                // moves cursor to the end
+                Platform.runLater(() -> {
+                    typing.requestFocus();
+                    typing.deselect();
+                    typing.positionCaret(typing.getText().length());
+                });
+
                 SentenceHistory history = new SentenceHistory(dbManager);
                 history.save(sentence, algoNames[algorithmOptions[0]]);
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.err.println("Error generating sentence: " + e.getMessage());
-        }});
+            }
+        });
 
         typing.setOnKeyReleased(event ->{
             /** fills the word bank with the top 3 autocomplete candidates for the last word typed */

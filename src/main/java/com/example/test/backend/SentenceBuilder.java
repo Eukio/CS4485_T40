@@ -26,37 +26,48 @@ public class SentenceBuilder{
         return this;
     }
 
-    public String buildSentence(String startingWord, int algo) throws SQLException{
-        /** Will build a sentence starting with the user given word*/
+
+    public String buildSentence(String startingWord, int algo) throws SQLException {
+        // If no starting word, pick a random one from the DB
+        if (startingWord == null || startingWord.isBlank()
+                || startingWord.equalsIgnoreCase("[END]")
+                || startingWord.equals(".")
+                || !wordService.wordExists(startingWord.toLowerCase())) {
+            startingWord = wordService.getRandomWord();
+        }
+
         long currentId = wordService.getWordId(startingWord.toLowerCase());
         List<String> words = new ArrayList<>();
         words.add(startingWord.toLowerCase());
 
-        for(int i = 0; i < maxLength; i++){
+        for (int i = 0; i < maxLength; i++) {
             List<WordCandidate> candidates = wordService.getNextWord(currentId);
-            if(candidates.isEmpty()){
+            if (candidates.isEmpty()) {
                 break;
             }
-            if(i>=3 && wordService.canEnd(currentId) && candidates.size() < threshold){
+            if (i >= 3 && wordService.canEnd(currentId) && candidates.size() < threshold) {
                 break;
             }
 
-            WordCandidate next = switch(algo){
+            WordCandidate next = switch (algo) {
                 case 0 -> greedyPick(candidates);
                 case 1 -> weightedPick(candidates);
-                case 2 -> temperaturePick(candidates, 1.5); // 1.5 is a nice middle ground. Should be fun.
+                case 2 -> temperaturePick(candidates, 1.5);
                 case 3 -> bpeChain != null ? bpeChain.pick(candidates, currentId, tokenizer) : weightedPick(candidates);
                 default -> weightedPick(candidates);
             };
 
+            //exclude the word [END]
+            if (next.word().equalsIgnoreCase("[END]")) {
+                break;
+            }
             words.add(next.word());
             currentId = next.id();
         }
 
         this.lastSentence = format(words);
         return this.lastSentence;
-        }
-
+    }
         public SentenceBuilder withBPE(BPEMarkovChain bpeChain, BPETokenizer tokenizer){
             /** This is a bit of a hack to avoid circular imports. I want the sentence builder to be able to use the BPEMarkovChain's pick method, but the BPEMarkovChain also needs to use the SentenceBuilder for its markovBuildSentence method. So instead of passing the BPEMarkovChain in the constructor, I just pass it in here. It's not ideal, but it works. */
             this.bpeChain = bpeChain;
