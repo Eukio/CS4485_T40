@@ -354,13 +354,33 @@ public class HelloApplication extends Application {
                 String regex = "[,\\.\\s]";
                 String[] words = sentences[sentences.length - 1].trim().split(regex); //get last sentence
                 System.out.println(words.length);
+
                 if (words.length > 1){
                     System.out.println(words[words.length - 2] + words[words.length - 1]);
-                    try{
-                        wordService.newWord(words[words.length - 2], words[words.length - 1]);
-                    }
-                    catch(Exception e){
+                    //POP-UP EUKI SANDRA WORK ON THIS vvv
+                    boolean yFlag = true;
+                    boolean zFlag = true;
+                    try {
+                        yFlag = wordService.wordExists(words[words.length - 1]);
+                        zFlag = wordService.wordExists(words[words.length - 2]);
+                    } catch (Exception e) {
                         System.err.println("Error adding new word: " + e.getMessage());
+                    }
+                    if(!yFlag){
+                        //POP UP?
+
+                    }
+                    if(!zFlag){
+                        //POP UP?
+                    }
+                    //POP-UP EUKI SANDRA WORK ON THIS ^^^
+
+                    if(yFlag && zFlag) { //if both words are added to database
+                        try {
+                            wordService.newWord(words[words.length - 2], words[words.length - 1]);
+                        } catch (Exception e) {
+                            System.err.println("Error adding new word: " + e.getMessage());
+                        }
                     }
                 } else { //border of sentence... can_start
 
