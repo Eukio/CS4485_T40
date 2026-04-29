@@ -173,7 +173,7 @@ public class WordService{
                 System.out.println("couldn't upload word");
             }
             //System.out.println(wordExists(word));
-            //con.commit();
+            con.commit();
         }
     }
 
@@ -220,12 +220,6 @@ public class WordService{
                 //clear cache
                 long prevId = getWordId(prev);
                 autocompleteCache.keySet().removeIf(key -> key.wordId() == prevId);
-//                try {
-//                    autocompleteCache.keySet().removeIf(key -> key.wordId() == getWordId(prev));
-//
-//                } catch(Exception e){
-//                    throw new SQLException("Word not found: " + e);
-//                }
             }else { //update link Count
                 String sql = """
                     UPDATE word_links w1
@@ -247,12 +241,15 @@ public class WordService{
                 //clear cache
                 long prevId = getWordId(prev);
                 autocompleteCache.keySet().removeIf(key -> key.wordId() == prevId);
-//                try {
-//                    autocompleteCache.keySet().removeIf(key -> key.wordId() == getWordId(prev));
-//
-//                } catch(Exception e){
-//                    throw new SQLException("Word not found: " + e);
-//                }
+
+                //test for freq:
+                sql = """
+                    SELECT frequency FROM word_links
+                    WHERE word_id = ? AND next_word_id = ?;        
+                """;
+                int freq = query(sql, resSet -> (resSet.next() ? resSet.getInt("frequency") : 0), getWordId(prev.toLowerCase()), getWordId(curr.toLowerCase()));
+                System.out.println(prev + "->" + curr + ": " + freq);
             }
+            con.commit();
     }
 }
