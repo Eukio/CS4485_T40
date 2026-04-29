@@ -24,6 +24,8 @@ public class UploadFilesScene extends BorderPane{
     private Stage window;
     public UploadFilesScene(HelloApplication mainApp, Stage window) throws IOException {
         this.window = window;
+        NavBar navBar = new NavBar(mainApp);
+        setTop(navBar);
         setUploadFilesScene(mainApp);
 
     }
@@ -140,7 +142,6 @@ public class UploadFilesScene extends BorderPane{
         app.setAlignment(Pos.CENTER_LEFT);
         app.setTranslateX(40);
         setCenter(app);
-        setTop(mainLabel);
         setAlignment(mainLabel, Pos.CENTER_RIGHT);
         setMargin(mainLabel, new Insets(10));
 

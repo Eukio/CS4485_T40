@@ -55,8 +55,14 @@ public class HelloApplication extends Application {
     private Stage window;
     private WordService wordService;
     private DatabaseManager dbManager;
-    private final int suggestions = 10; //placeholder for number of suggestions to show
-    private final String[] algoNames = {"Greedy", "Random Weighted", "Temperature", "BPE Markov"};
+
+    public static final String DARKNAVY =  "#466CCC";
+    public static final String SELECTEDNAVY =  "#99AEE2";
+    public static final String FILEUPLOADBLUE =  "#EDF2FF";
+    public static final String LIGHTBLUE =  "#D3DFFF";
+    public static final String ADDWORDGRAY = "#C5C5C5";
+    public static final String TEXTGRAY =  "#434343";
+
     private final BPETokenizer[] tokenizer = {null};
     private final BPEMarkovChain[] bpeChain = {null};
 
@@ -101,23 +107,28 @@ public class HelloApplication extends Application {
         window.setTitle("Sentence Builder App");
         window.show();
     }
-    // SETS the display for HomeScene
+
+    // sets display for each scene
     public void showHomeScene(){
     Scene scene = new Scene(new HomeScene(this), 800,320);
     window.setScene(scene);
     }
+
     public void showUploadFilesScene() throws IOException {
         Scene scene = new Scene(new UploadFilesScene(this, window), 800, 320);
         window.setScene(scene);
     }
+
     public void showAutoCompleteScene() throws IOException {
         Scene scene = new Scene(new AutoCompleteScene(this, wordService, dbManager), 800, 320);
         window.setScene(scene);
     }
+
     public void showBuildSentencesScene(){
         Scene scene = new Scene(new BuildSentencesScene(this), 800, 320);
         window.setScene(scene);
     }
+
     public void showReportsScene(){
         Scene scene = new Scene(new ReportsScene(this), 800, 320);
         window.setScene(scene);

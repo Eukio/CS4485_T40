@@ -34,6 +34,8 @@ public class AutoCompleteScene extends BorderPane {
     public AutoCompleteScene(HelloApplication mainApp, WordService wordService, DatabaseManager dbManager) throws IOException {
         this.wordService = wordService;
         this.dbManager = dbManager;
+        NavBar navBar = new NavBar(mainApp);
+        setTop(navBar);
         setAutoCompleteScene(mainApp);
 
     }
@@ -42,10 +44,10 @@ public class AutoCompleteScene extends BorderPane {
         Button[] suggestionFields = new Button[suggestions]; // change to a button instead of textfield
         Button algoButton = new Button("Algorithm: Greedy"); // expect a lot of mention of whale.
         Button generateButton = new Button("Generate Sentence");
-        Button toImportSceneButton = new Button("<-");
+//        Button toImportSceneButton = new Button("<-");
         TextArea typing = new TextArea();
         createTypingTextArea();
-        createToImportSceneButton(toImportSceneButton,mainApp);
+//        createToImportSceneButton(toImportSceneButton,mainApp);
         ScrollPane wordBankScroll= createRightWordBank(suggestionFields);
         wordBankScroll.setFitToWidth(true);
         wordBankScroll.setPrefHeight(320);
@@ -111,14 +113,14 @@ public class AutoCompleteScene extends BorderPane {
 
         //try hbox as grid
         Label mainLabel = new Label("CS4485_Team40");
-        HBox app = new HBox(toImportSceneButton, left, wordBankScroll, reportTextArea, mainLabel);
+        HBox app = new HBox(left, wordBankScroll, reportTextArea, mainLabel);
         app.setAlignment(Pos.CENTER_LEFT);;
 
         setCenter(app);
         setRight(wordBankScroll);
         setBottom(reportTextArea);
 
-        setTop(mainLabel);
+      //  setTop(mainLabel);
 
         setAlignment(mainLabel, Pos.CENTER_RIGHT);
         setMargin(mainLabel, new Insets(10));
@@ -225,23 +227,23 @@ public class AutoCompleteScene extends BorderPane {
         buttons.setSpacing(10);
     }
     // Typing TextArea for autocompleteScene
-    public void createToImportSceneButton(Button toImportSceneButton, HelloApplication mainApp) throws IOException{
-        Color color3 = Color.web("#00000040"); //Continue Button
-        CornerRadii radii = new CornerRadii(10);
-        toImportSceneButton.setOnAction(e -> {
-            try {
-                mainApp.showUploadFilesScene();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        BackgroundFill backgroundFill0 = new BackgroundFill(color3, radii, new Insets(10));
-        Background background0 = new Background(backgroundFill0);
-        toImportSceneButton.setTextFill(Color.BLACK);
-        toImportSceneButton.setBackground(background0);
-        toImportSceneButton.setPrefSize(60, 60); // sets both width and height
-
-    }
+//    public void createToImportSceneButton(Button toImportSceneButton, HelloApplication mainApp) throws IOException{
+//        Color color3 = Color.web("#00000040"); //Continue Button
+//        CornerRadii radii = new CornerRadii(10);
+//        toImportSceneButton.setOnAction(e -> {
+//            try {
+//                mainApp.showUploadFilesScene();
+//            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+//            }
+//        });
+//        BackgroundFill backgroundFill0 = new BackgroundFill(color3, radii, new Insets(10));
+//        Background background0 = new Background(backgroundFill0);
+//        toImportSceneButton.setTextFill(Color.BLACK);
+//        toImportSceneButton.setBackground(background0);
+//        toImportSceneButton.setPrefSize(60, 60); // sets both width and height
+//
+//    }
     // Updates wordbank for autocompleteScene
     private void updateWordBank(String lastWord, Button[] suggestionFields, TextArea typing, TextArea reportTextArea) {
         try {
