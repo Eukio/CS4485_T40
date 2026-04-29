@@ -350,8 +350,9 @@ public class HelloApplication extends Application {
                 }
                 //Word extraction for updating old words or adding new words
                 //only update after another word is typed, provide context
+                String[] sentences = text.split("\\.");
                 String regex = "[,\\.\\s]";
-                String[] words = text.split(regex);
+                String[] words = sentences[sentences.length - 1].trim().split(regex); //get last sentence
                 System.out.println(words.length);
                 if (words.length > 1){
                     System.out.println(words[words.length - 2] + words[words.length - 1]);
@@ -361,7 +362,11 @@ public class HelloApplication extends Application {
                     catch(Exception e){
                         System.err.println("Error adding new word: " + e.getMessage());
                     }
+                } else { //border of sentence... can_start
+
                 }
+
+                //passes last word regardless of punctuation, returns '.' at the end...
                 String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
                 updateWordBank(lastWord, suggestionFields);
         }});

@@ -29,7 +29,7 @@ public class DatabaseManager implements AutoCloseable {
      */
     public DatabaseManager(DatabaseConfig config) throws SQLException {
         this.connection = DriverManager.getConnection(config.jdbcUrl(), config.username(), config.password());
-        this.connection.setAutoCommit(false);
+        this.connection.setAutoCommit(false); // set changes to database permenant
     }
 
     /**
