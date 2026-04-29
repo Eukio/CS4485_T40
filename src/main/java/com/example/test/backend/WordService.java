@@ -173,7 +173,7 @@ public class WordService{
                 System.out.println("couldn't upload word");
             }
             //System.out.println(wordExists(word));
-            //con.commit();
+            con.commit();
         }
     }
 
@@ -250,6 +250,6 @@ public class WordService{
                 int freq = query(sql, resSet -> (resSet.next() ? resSet.getInt("frequency") : 0), getWordId(prev.toLowerCase()), getWordId(curr.toLowerCase()));
                 System.out.println(prev + "->" + curr + ": " + freq);
             }
-            //con.commit();
+            con.commit();
     }
 }
