@@ -1,16 +1,12 @@
 package com.example.test;
 
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Properties;
-
-import static java.lang.System.out;
 
 import com.example.test.Scenes.*;
 import com.example.test.backend.BPEMarkovChain;
 import com.example.test.backend.BPETokenizer;
 import com.example.test.backend.SentenceBuilder;
-import com.example.test.backend.SentenceHistory;
 import com.example.test.backend.WordService;
 
 import com.example.test.db.DatabaseConfig;
@@ -21,33 +17,9 @@ import com.example.test.util.CorpusLoader;
 
 import javafx.application.Application;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-
 import javafx.scene.Scene;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-
-import javafx.scene.input.KeyCode;
-
-import javafx.scene.layout.*;
-
-import javafx.scene.paint.Color;
-
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-
 import javafx.stage.Stage;
-
-import javafx.application.Platform;
-
-
-import javafx.stage.FileChooser;
-import java.io.File;
-import com.example.test.service.BookFolderImporter;
 
 
 public class HelloApplication extends Application {
@@ -65,6 +37,7 @@ public class HelloApplication extends Application {
 
     private final BPETokenizer[] tokenizer = {null};
     private final BPEMarkovChain[] bpeChain = {null};
+
 
     public static void main(String[] args){
         launch(args);
@@ -108,29 +81,44 @@ public class HelloApplication extends Application {
         window.show();
     }
 
+    private void applyStylesheet(Scene scene) {
+        System.out.println("Class location: " + getClass().getProtectionDomain().getCodeSource().getLocation());
+
+        String css = getClass().getResource("/com/example/test/styles.css").toExternalForm();
+//        String css = getClass().getResource("styles.css").toExternalForm();
+        scene.getStylesheets().add(css);
+    }
+
     // sets display for each scene
     public void showHomeScene(){
-    Scene scene = new Scene(new HomeScene(this), 800,320);
-    window.setScene(scene);
+        Scene scene = new Scene(new HomeScene(this), 800, 320);
+        applyStylesheet(scene);
+        window.setScene(scene);
+//    Scene scene = new Scene(new HomeScene(this), 800,320);
+//    window.setScene(scene);
     }
 
     public void showUploadFilesScene() throws IOException {
         Scene scene = new Scene(new UploadFilesScene(this, window), 800, 320);
+        applyStylesheet(scene);
         window.setScene(scene);
     }
 
     public void showAutoCompleteScene() throws IOException {
         Scene scene = new Scene(new AutoCompleteScene(this, wordService, dbManager), 800, 320);
+        applyStylesheet(scene);
         window.setScene(scene);
     }
 
     public void showBuildSentencesScene(){
         Scene scene = new Scene(new BuildSentencesScene(this), 800, 320);
+        applyStylesheet(scene);
         window.setScene(scene);
     }
 
     public void showReportsScene(){
         Scene scene = new Scene(new ReportsScene(this), 800, 320);
+        applyStylesheet(scene);
         window.setScene(scene);
     }
 
