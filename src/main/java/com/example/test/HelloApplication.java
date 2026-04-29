@@ -1,7 +1,6 @@
 package com.example.test;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Properties;
 
 import static java.lang.System.out;
@@ -19,18 +18,22 @@ import com.example.test.util.ConfigLoader;
 import com.example.test.util.CorpusLoader;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 import javafx.scene.Scene;
+import javafx.scene.Group;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import javafx.scene.layout.*;
 
@@ -67,7 +70,7 @@ public class HelloApplication extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws IOException, SQLException {
+    public void start(Stage primaryStage) throws IOException {
         configDatabase();
         createWindow(primaryStage);
     }
@@ -97,7 +100,7 @@ public class HelloApplication extends Application {
 
     }
 
-    public void createWindow(Stage primaryStage) throws IOException, SQLException {
+    public void createWindow(Stage primaryStage) throws IOException{
         window = primaryStage;
         //Eucharist Tan
         setImportScene();
@@ -320,58 +323,18 @@ public class HelloApplication extends Application {
 
         buttons.setSpacing(10);
     }
-    public void createTextArea(TextArea textArea) throws IOException{
+    public TextArea createTypingTextArea(){
         Color color = Color.web("#c1c8e6");
         CornerRadii radii = new CornerRadii(10);
         BackgroundFill backgroundFill = new BackgroundFill(color, radii, Insets.EMPTY);
         Background background = new Background(backgroundFill);
-        textArea.setPrefRowCount(10);
-        textArea.setPrefColumnCount(30);
-        textArea.setWrapText(true);
-        textArea.setPadding(new Insets(10)); //same as Insets(10,10,10,10)
-        textArea.setBackground(background);
-    }
-    /*
-     //TODO: Make this similar to WordBank, allow refresh, but create a word details button, half screen of reporting info
-    public ScrollPane setReportBox(Button[] suggestionFields, String word) throws SQLException {
-        Text reportBoxtTitle = new Text(20, 100, "");
-        wordBankTitle.setFont(Font.font("Verdana", 20));
-
-        Color color2 = Color.web("#4e60ba");
-        CornerRadii radii = new CornerRadii(10);
-
-        for (int i = 0; i < suggestions; i++) {
-            suggestionFields[i] = new Button();
-            DatabaseManager.WordDetails selectedWordDetail = dbManager.getWordDetails(word);
-            suggestionFields[i].setVisible(false); // hide until populated
-            suggestionFields[i].setPrefWidth(160);
-            BackgroundFill bf = new BackgroundFill(color2, radii, new Insets(4));
-            suggestionFields[i].setBackground(new Background(bf));
-            suggestionFields[i].setTextFill(Color.WHITE);
-        }
-
-        ScrollPane reportDetails = new ScrollPane(wordBankTitle);
-        reportDetails.getChildren().addAll(suggestionFields);
-        reportDetails.setSpacing(10);
-        reportDetails.setPadding(new Insets(10));
-
-        Color color = Color.web("#c1c8e6");
-        BackgroundFill backgroundFill = new BackgroundFill(color, new CornerRadii(10), Insets.EMPTY);
-        reportDetails.setBackground(new Background(backgroundFill));
-
-        return new ScrollPane(reportDetails);
-
-    }
-
-
-     */
-
-
-    //TODO: Actual reporting here
-    public void setReportTextArea(TextArea textArea, String word) throws SQLException {
-       // DatabaseManager.WordDetails selectedWord = dbManager.getWordDetails(word);
-        textArea.setText(dbManager.printWordDetails(word));
-
+        TextArea outputTextArea = new TextArea();
+        outputTextArea.setPrefRowCount(10);
+        outputTextArea.setPrefColumnCount(30);
+        outputTextArea.setWrapText(true);
+        outputTextArea.setPadding(new Insets(10)); //same as Insets(10,10,10,10)
+        outputTextArea.setBackground(background);
+        return outputTextArea;
     }
     public void createToImportSceneButton(Button toImportSceneButton) throws IOException{
         Color color3 = Color.web("#00000040"); //Continue Button
@@ -384,13 +347,13 @@ public class HelloApplication extends Application {
         toImportSceneButton.setPrefSize(60, 60); // sets both width and height
 
     }
-    public void setWordGeneratorScene() throws IOException, SQLException {
+    public void setWordGeneratorScene() throws IOException {
         Button[] suggestionFields = new Button[suggestions]; // change to a button instead of textfield
         Button algoButton = new Button("Algorithm: Greedy"); // expect a lot of mention of whale.
         Button generateButton = new Button("Generate Sentence");
         Button toImportSceneButton = new Button("<-");
         TextArea typing = new TextArea();
-        createTextArea(typing);
+        createTypingTextArea();
         createToImportSceneButton(toImportSceneButton);
         ScrollPane wordBankScroll= createRightWordBank(suggestionFields);
         wordBankScroll.setFitToWidth(true);
@@ -400,7 +363,6 @@ public class HelloApplication extends Application {
         left.setPadding(new Insets(10));
 
         TextArea reportTextArea = new TextArea();
-        createTextArea(reportTextArea);
 
         int maxAlgo = 4; //placeholder for number of algorithms
         int[] algorithmOptions = {0};
@@ -415,21 +377,35 @@ public class HelloApplication extends Application {
         }});
 
         generateButton.setOnAction(event -> {
-            /** Should grab the current text from the typing field, then saves it to the sentence history */
             String text = typing.getText().trim();
-            if(text.isEmpty()){
-                return;
-            }try{
-                String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
+            try {
+                // Strip trailing [END] or punctuation left over from previous generation
+                String cleaned = text.replaceAll("\\s*\\[END\\]\\.?$", "").replaceAll("[.!?]+$", "").trim();
+
+                String lastWord = cleaned.isEmpty() ? null
+                        : cleaned.contains(" ") ? cleaned.substring(cleaned.lastIndexOf(" ") + 1).trim()
+                        : cleaned;
+
                 out.println("Using algorithm: " + algorithmOptions[0]);
                 String sentence = new SentenceBuilder(wordService).buildSentence(lastWord, algorithmOptions[0]);
                 out.println("Generated sentence: " + sentence);
-                typing.setText(sentence);
+
+                //edited so that it doesn't replace all the text
+                String current = typing.getText().trim();
+                typing.setText(current.isEmpty() ? sentence : current + " " + sentence);
+                // moves cursor to the end
+                Platform.runLater(() -> {
+                    typing.requestFocus();
+                    typing.deselect();
+                    typing.positionCaret(typing.getText().length());
+                });
+
                 SentenceHistory history = new SentenceHistory(dbManager);
                 history.save(sentence, algoNames[algorithmOptions[0]]);
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.err.println("Error generating sentence: " + e.getMessage());
-        }});
+            }
+        });
 
         typing.setOnKeyReleased(event ->{
             /** fills the word bank with the top 3 autocomplete candidates for the last word typed */
@@ -468,25 +444,15 @@ public class HelloApplication extends Application {
                 for (int i = 0; i < suggestionFields.length; i++) {
                     if (i < candidates.size()) {
                         String word = candidates.get(i).word();
-                        suggestionFields[i].setText(word);
+                        String displayWord = word.equals("[END]") ? "." : word;
+                        suggestionFields[i].setText(displayWord);
                         suggestionFields[i].setVisible(true);
                         suggestionFields[i].setOnAction(e -> {
                             String current = typing.getText();
                             if (current.contains(" ")) {
-                                typing.setText(current.substring(0, current.lastIndexOf(" ") + 1) + word);
-                                try {
-                                    setReportTextArea(reportTextArea,"string"); //TODO: Temporary to see word Details
-                                } catch (SQLException ex) {
-                                    throw new RuntimeException(ex);
-                                }
-
+                                typing.setText(current.substring(0, current.lastIndexOf(" ") + 1) + displayWord);
                             } else {
-                                try {
-                                    setReportTextArea(reportTextArea,"string"); //TODO: Temporary to see word Details
-                                } catch (SQLException ex) {
-                                    throw new RuntimeException(ex);
-                                }
-                                typing.setText(word);
+                                typing.setText(displayWord);
                             }
                             Platform.runLater(() -> {
                                 typing.positionCaret(typing.getText().length());

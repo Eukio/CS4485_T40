@@ -63,6 +63,7 @@ public class WordService{
         }, word.toLowerCase());
     }
 
+
     public boolean canEnd(long wordId) throws SQLException{
         /** searches the database for the word's ID and it checksthe column if it can end, and if it is true returns true. else false. */
         return query("SELECT can_end FROM words WHERE id = ?", resSet -> resSet.next() && resSet.getBoolean("can_end"), wordId);
@@ -157,4 +158,16 @@ public class WordService{
     public boolean wordExists(String word) throws SQLException{
         /** checks if a word exists in the database. */
         return query("SELECT id FROM words WHERE word = ?", resSet -> resSet.next(), word.toLowerCase());
-    }}
+    }
+
+    public String getRandomWord() throws SQLException {
+        String sql = "SELECT word FROM words ORDER BY RAND() LIMIT 1";
+        try (var stmt = con.prepareStatement(sql);
+             var rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString("word");
+            }
+        }
+        throw new SQLException("No words found in database");
+    }
+}
