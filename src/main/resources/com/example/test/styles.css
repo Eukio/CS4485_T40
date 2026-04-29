@@ -1,3 +1,78 @@
+/* ── Hero text ───────────────────────────────────────────── */
+.hero-text {
+    -fx-font-family: "Verdana";
+    -fx-font-size: 50px;
+    -fx-fill: #1a1a1a;
+}
+
+.hero-text-accent {
+    -fx-font-family: "Verdana";
+    -fx-font-size: 50px;
+    -fx-fill: #4e60ba;
+}
+
+/* ── Subtitle / prompt label ─────────────────────────────── */
+.subtitle-text {
+    -fx-font-family: "Verdana";
+    -fx-font-size: 20px;
+}
+
+/* ── Typing area ─────────────────────────────────────────── */
+.typing-area {
+    -fx-background-color: #c1c8e6;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+}
+
+/* ── Word bank panel ─────────────────────────────────────── */
+.word-bank {
+    -fx-background-color: #c1c8e6;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+    -fx-spacing: 10;
+}
+
+/* ── Word bank suggestion buttons ────────────────────────── */
+.suggestion-button {
+    -fx-background-color: #4e60ba;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-pref-width: 160;
+    -fx-cursor: hand;
+}
+
+.suggestion-button:hover {
+    -fx-background-color: #466CCC;
+}
+
+/* ── Algorithm toggle button ─────────────────────────────── */
+.algo-button {
+    -fx-background-color: #c1c8e6;
+    -fx-text-fill: #4e60ba;
+    -fx-background-radius: 10;
+    -fx-pref-width: 200;
+    -fx-pref-height: 60;
+    -fx-cursor: hand;
+}
+
+.algo-button:hover {
+    -fx-background-color: #99AEE2;
+}
+
+/* ── Generate sentence button ────────────────────────────── */
+.generate-button {
+    -fx-background-color: #4e60ba;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-pref-width: 200;
+    -fx-pref-height: 60;
+    -fx-cursor: hand;
+}
+
+.generate-button:hover {
+    -fx-background-color: #466CCC;
+}
+
 /* ── Base button ─────────────────────────────────────────── */
 .button {
     -fx-background-color: #99AEE2;
