@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -91,18 +92,41 @@ public class UploadFilesScene extends BorderPane{
             }
         });
 
-        VBox box = new VBox(welcome0, welcome1, uploadLabel, importFileButton, toWordGeneratorButton);
+        //TODO: Christian's button
+        Button showFileDetailsButton = new Button("File Info");
+        showFileDetailsButton.getStyleClass().add("continue-button");
+
+        HBox buttonContainer = new HBox(10, toWordGeneratorButton, showFileDetailsButton);
+        VBox box = new VBox(10, welcome0, welcome1, uploadLabel, importFileButton, buttonContainer);
         box.setPadding(new Insets(10));
 
-        Label mainLabel = new Label("CS4485_Team40");
-        HBox app = new HBox(box);
+        ScrollPane fileDetailsPane = fileDetailsPane();
+        setRight(fileDetailsPane);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox app = new HBox(box,spacer, fileDetailsPane);
         app.setSpacing(20);
         app.setAlignment(Pos.CENTER_LEFT);
-        app.setTranslateX(40);
+        app.setPadding(new Insets(0, 20, 0, 40));
 
         setCenter(app);
-        setAlignment(mainLabel, Pos.CENTER_RIGHT);
-        setMargin(mainLabel, new Insets(10));
     }
-
+    //TODO: Christian's scrollPane
+    public ScrollPane fileDetailsPane(){
+        Text fileTitleText = new Text(10, 100, "File Details");
+        fileTitleText.getStyleClass().add("subtitle-text");
+            Text fileDetailsText = new Text("This is the file details here...");
+            fileDetailsText.setWrappingWidth(280);
+        VBox fileDetailsBox = new VBox(fileTitleText);
+        fileDetailsBox.getChildren().add(fileDetailsText);
+        ScrollPane scrollBox = new ScrollPane(fileDetailsBox);
+        scrollBox.setPrefViewportWidth(300);
+        scrollBox.setPrefViewportHeight(100);
+        scrollBox.setFitToWidth(true);
+        scrollBox.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollBox.setPrefHeight(320);
+        return scrollBox;
+    }
 }
