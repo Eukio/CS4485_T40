@@ -102,6 +102,26 @@ public class UploadFilesScene extends BorderPane {
         //TODO: Christian here is your button
         Button showDuplicatesButton = new Button("Show Duplicates");
 
+        showDuplicatesButton.setOnAction(e -> {
+            try {
+                Properties props = ConfigLoader.loadConfig();
+
+                DatabaseConfig config = new DatabaseConfig(
+                        props.getProperty("db.jdbcUrl"),
+                        props.getProperty("db.username"),
+                        props.getProperty("db.password")
+                );
+
+                try (DatabaseManager db = new DatabaseManager(config)) {
+                    fileDetailsText.setText(db.getDuplicateFileNamesString());
+                }
+
+            } catch (Exception ex) {
+                fileDetailsText.setText("Could not load duplicate file names: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        });
+
         // ================= NAV BUTTON =================
         Button toWordGeneratorButton = new Button("Continue");
         toWordGeneratorButton.getStyleClass().add("continue-button");
