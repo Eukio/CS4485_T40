@@ -59,6 +59,7 @@ public class UploadFilesScene extends BorderPane {
 
         // ================= FILE IMPORT BUTTON =================
         Button importFileButton = new Button("Click Here");
+        importFileButton.setPrefWidth(460);
 
         importFileButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
@@ -97,10 +98,15 @@ public class UploadFilesScene extends BorderPane {
                 }
             }
         });
+        // ================= SHOW DUPLICATES BUTTON =================
+        //TODO: Christian here is your button
+        Button showDuplicatesButton = new Button("Show Duplicates");
 
         // ================= NAV BUTTON =================
         Button toWordGeneratorButton = new Button("Continue");
         toWordGeneratorButton.getStyleClass().add("continue-button");
+        toWordGeneratorButton.setStyle("-fx-background-color: " + HelloApplication.DARKNAVY + ";");
+
 
         toWordGeneratorButton.setOnAction(e -> {
             try {
@@ -136,7 +142,7 @@ public class UploadFilesScene extends BorderPane {
         });
 
         // ================= LAYOUT =================
-        HBox buttonContainer = new HBox(10, toWordGeneratorButton, showFileDetailsButton);
+        HBox buttonContainer = new HBox(10, toWordGeneratorButton, showDuplicatesButton, showFileDetailsButton);
 
         VBox box = new VBox(
                 10,
