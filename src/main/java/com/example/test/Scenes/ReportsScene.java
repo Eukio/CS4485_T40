@@ -6,6 +6,6 @@ import javafx.scene.layout.BorderPane;
 
 public class ReportsScene extends BorderPane {
     public ReportsScene(HelloApplication mainApp){
-        NavBar navBar = new NavBar(mainApp);
+        NavBar navBar = new NavBar(mainApp, "reports");
         setTop(navBar);
     }}

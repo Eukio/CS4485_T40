@@ -6,7 +6,7 @@ import javafx.scene.layout.BorderPane;
 
 public class BuildSentencesScene extends BorderPane {
     public BuildSentencesScene(HelloApplication mainApp) {
-        NavBar navBar = new NavBar(mainApp);
+        NavBar navBar = new NavBar(mainApp, "build");
         setTop(navBar);
     }
 

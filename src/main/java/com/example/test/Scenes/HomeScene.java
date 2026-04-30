@@ -18,7 +18,7 @@ public class HomeScene extends BorderPane {
     }
 
     public void setHomeScene(HelloApplication mainApp) {
-        NavBar navBar = new NavBar(mainApp);
+        NavBar navBar = new NavBar(mainApp, "home");
         setTop(navBar);
 
         Text welcomeLine = new Text("Welcome to_\n");

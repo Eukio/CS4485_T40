@@ -36,7 +36,7 @@ public class UploadFilesScene extends BorderPane {
     public UploadFilesScene(HelloApplication mainApp, Stage window) throws IOException {
         this.window = window;
 
-        NavBar navBar = new NavBar(mainApp);
+        NavBar navBar = new NavBar(mainApp, "upload");
         setTop(navBar);
 
         setUploadFilesScene(mainApp);

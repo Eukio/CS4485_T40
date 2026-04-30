@@ -34,7 +34,7 @@ public class AutoCompleteScene extends BorderPane {
     public AutoCompleteScene(HelloApplication mainApp, WordService wordService, DatabaseManager dbManager) throws IOException {
         this.wordService = wordService;
         this.dbManager = dbManager;
-        NavBar navBar = new NavBar(mainApp);
+        NavBar navBar = new NavBar(mainApp, "autocomplete");
         setTop(navBar);
         setAutoCompleteScene(mainApp);
 
