@@ -90,36 +90,33 @@ public class HelloApplication extends Application {
     }
 
     // sets display for each scene
-    public void showHomeScene(){
-        Scene scene = new Scene(new HomeScene(this), 800, 320);
+    public void showHomeScene() {
+        Scene scene = new Scene(new HomeScene(this), 1200, 700);
         applyStylesheet(scene);
         window.setScene(scene);
-//    Scene scene = new Scene(new HomeScene(this), 800,320);
-//    window.setScene(scene);
     }
 
     public void showUploadFilesScene() throws IOException {
-        Scene scene = new Scene(new UploadFilesScene(this, window), 800, 320);
+        Scene scene = new Scene(new UploadFilesScene(this, window), 1200, 700);
         applyStylesheet(scene);
         window.setScene(scene);
     }
 
     public void showAutoCompleteScene() throws IOException {
-        Scene scene = new Scene(new AutoCompleteScene(this, wordService, dbManager), 800, 320);
+        Scene scene = new Scene(new AutoCompleteScene(this, wordService, dbManager), 1200, 700);
         applyStylesheet(scene);
         window.setScene(scene);
     }
 
-    public void showBuildSentencesScene(){
-        Scene scene = new Scene(new BuildSentencesScene(this), 800, 320);
+    public void showBuildSentencesScene() {
+        Scene scene = new Scene(new BuildSentencesScene(this), 1200, 700);
         applyStylesheet(scene);
         window.setScene(scene);
     }
 
-    public void showReportsScene(){
-        Scene scene = new Scene(new ReportsScene(this), 800, 320);
+    public void showReportsScene() {
+        Scene scene = new Scene(new ReportsScene(this), 1200, 700);
         applyStylesheet(scene);
         window.setScene(scene);
     }
-
 }
