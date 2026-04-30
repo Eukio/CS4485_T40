@@ -8,6 +8,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+//Christian Verderame
 /**
  * Utility class that converts raw text into normalized sentences and words.
  *
@@ -29,6 +31,7 @@ public final class TextPreprocessor {
         // Utility class: prevent instantiation.
     }
 
+    //Christian Verderame
     /**
      * Converts raw text into a list of parsed sentences.
      */
@@ -46,6 +49,7 @@ public final class TextPreprocessor {
         return sentences;
     }
 
+    //Christian Verderame
     /**
      * Extracts normalized words from one string chunk.
      */
@@ -60,6 +64,7 @@ public final class TextPreprocessor {
         return words;
     }
 
+    //Christian Verderame
     /**
      * Performs simple normalization before sentence splitting/tokenization.
      *
