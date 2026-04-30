@@ -450,6 +450,12 @@ public class DatabaseManager implements AutoCloseable {
      * Simple debug function to print everything about a word.
      */
     public String printWordDetails(String word) throws SQLException {
+
+        String[] arrOfStr = word.split(" ");
+        if(arrOfStr.length > 1){
+            return "" + word + " needs to be a single word";
+        }
+
         WordDetails d = getWordDetails(word);
 
         if (d == null) {
