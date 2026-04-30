@@ -513,8 +513,11 @@ public class DatabaseManager implements AutoCloseable {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
+                String fullFilename = rs.getString("filename");
+                String shortFilename = java.nio.file.Paths.get(fullFilename).getFileName().toString();
+
                 sb.append("File ID: ").append(rs.getLong("id")).append("\n");
-                sb.append("Name: ").append(rs.getString("filename")).append("\n");
+                sb.append("Name: ").append(shortFilename).append("\n");
                 sb.append("Total Words: ").append(rs.getLong("total_words")).append("\n");
                 sb.append("Unique Words: ").append(rs.getLong("unique_words")).append("\n");
                 sb.append("------------------------\n");
@@ -523,6 +526,57 @@ public class DatabaseManager implements AutoCloseable {
 
         return sb.toString();
     }
+
+
+
+
+    //Christian Verderame
+    /**
+     * Returns a string with all files that are duplicates(same name, different path)
+     */
+    public String getDuplicateFileNamesString() throws SQLException {
+
+        String sql = """
+        SELECT 
+            SUBSTRING_INDEX(filename, '\\\\', -1) AS short_name,
+            COUNT(*) AS count,
+            GROUP_CONCAT(filename SEPARATOR '\\n') AS full_paths
+        FROM imported_files
+        GROUP BY short_name
+        HAVING COUNT(*) > 1
+        ORDER BY short_name
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== DUPLICATE FILE NAMES ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                String name = rs.getString("short_name");
+                int count = rs.getInt("count");
+                String paths = rs.getString("full_paths");
+
+                sb.append("File Name: ").append(name).append("\n");
+                sb.append("Occurrences: ").append(count).append("\n");
+                sb.append("Locations:\n").append(paths).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No duplicate file names found.");
+            }
+        }
+
+        return sb.toString();
+    }
+
+
 
 //TODO: String that sees a list of all words in the system and information about them
 
