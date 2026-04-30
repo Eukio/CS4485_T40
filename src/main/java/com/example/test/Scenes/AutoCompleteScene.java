@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.text.TextFlow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -41,13 +42,25 @@ public class AutoCompleteScene extends BorderPane {
     }
     public void setAutoCompleteScene(HelloApplication mainApp) throws IOException {
         Button[] suggestionFields = new Button[suggestions];
+
         Button algoButton = new Button("Algorithm: Greedy");
         algoButton.getStyleClass().add("algo-button");
-        algoButton.setPrefSize(240, 72);
+        algoButton.setPrefSize(240, 60);
 
         Button generateButton = new Button("Generate Sentence");
         generateButton.getStyleClass().add("generate-button");
-        generateButton.setPrefSize(240, 72);
+        generateButton.setPrefSize(240, 60);
+
+        // Double border — same as import button in UploadFilesScene
+        BorderStroke outerStroke = new BorderStroke(
+                Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(1)
+        );
+        BorderStroke innerStroke = new BorderStroke(
+                Color.BLACK, BorderStrokeStyle.DASHED, new CornerRadii(10), new BorderWidths(1), new Insets(4)
+        );
+        Border buttonBorder = new Border(outerStroke, innerStroke);
+        generateButton.setBorder(buttonBorder);
+        generateButton.setBackground(new Background(new BackgroundFill(Color.web("#EDF2FF"), new CornerRadii(10), new Insets(10))));
 
         TextArea typing = new TextArea();
         typing.getStyleClass().add("typing-area");
@@ -60,8 +73,6 @@ public class AutoCompleteScene extends BorderPane {
         VBox left = createLeftVBox(algoButton, generateButton, typing);
         left.setPadding(new Insets(10));
 
-//        TextArea reportTextArea = new TextArea();
-
         int maxAlgo = 4;
         int[] algorithmOptions = {0};
         algoButton.setOnAction(event -> {
@@ -72,7 +83,6 @@ public class AutoCompleteScene extends BorderPane {
                 String lastWord = text.contains(" ") ?
                         text.substring(text.lastIndexOf(" ") + 1) : text;
                 updateWordBank(lastWord, suggestionFields, typing);
-//                updateWordBank(lastWord, suggestionFields, typing, reportTextArea);
             }
         });
 
@@ -106,7 +116,6 @@ public class AutoCompleteScene extends BorderPane {
                 if (text.isEmpty()) return;
                 String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
                 updateWordBank(lastWord, suggestionFields, typing);
-//                updateWordBank(lastWord, suggestionFields, typing, reportTextArea);
             }
         });
 
@@ -115,9 +124,7 @@ public class AutoCompleteScene extends BorderPane {
         HBox.setHgrow(left, Priority.ALWAYS);
 
         setCenter(app);
-//        setBottom(reportTextArea);
     }
-
     public ScrollPane createRightWordBank(Button[] suggestionFields) throws IOException {
         Text wordBankTitle = new Text("Next Word");
         wordBankTitle.getStyleClass().add("word-bank-title");
@@ -138,21 +145,25 @@ public class AutoCompleteScene extends BorderPane {
     }
 
     public VBox createLeftVBox(Button algoButton, Button generateButton, TextArea typing) throws IOException {
-        Text welcome0 = new Text("Autocomplete_");
+        Text welcome0 = new Text("Autocomplete");
         welcome0.getStyleClass().add("hero-text");
 
-        Text typingLabel = new Text("Start typing to see your autocomplete suggestions");
-        typingLabel.getStyleClass().add("typing-label");
+        Text welcome1 = new Text("_");
+        welcome1.getStyleClass().add("hero-text-accent");
 
-        HBox buttons = new HBox(generateButton, algoButton);
-        buttons.setSpacing(12);
+        TextFlow heroText = new TextFlow(welcome0, welcome1);
 
-        VBox left = new VBox(24, welcome0, typingLabel, typing, buttons);
-        left.setPadding(new Insets(0, 0, 0, 72));
+        Label typingLabel = new Label("Start typing to see your autocomplete suggestions");
+        typingLabel.getStyleClass().add("upload-label");
+
+        HBox buttons = new HBox(12, generateButton, algoButton);
+        buttons.setAlignment(Pos.CENTER_LEFT);
+
+        VBox left = new VBox(24, heroText, typingLabel, buttons, typing);
+        left.setPadding(new Insets(0, 72, 40, 72));
         left.setAlignment(Pos.CENTER_LEFT);
         return left;
     }
-
     public void createAlgorithmButtons(Button algoButton, Button generateButton, HBox buttons) throws IOException {
         algoButton.setPrefSize(240, 72);
         generateButton.setPrefSize(240, 72);

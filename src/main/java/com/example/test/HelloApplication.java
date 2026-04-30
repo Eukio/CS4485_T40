@@ -74,6 +74,14 @@ public class HelloApplication extends Application {
 
     }
 
+    public WordService getWordService() {
+        return wordService;
+    }
+
+    public DatabaseManager getDbManager() {
+        return dbManager;
+    }
+
     public void createWindow(Stage primaryStage){
         window = primaryStage;
         showHomeScene();
