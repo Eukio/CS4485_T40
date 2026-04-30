@@ -579,6 +579,48 @@ public class DatabaseManager implements AutoCloseable {
 
 
 //TODO: String that sees a list of all words in the system and information about them
+public String getAllWords() throws SQLException {
+
+    String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        ORDER BY id
+        LIMIT 50
+    """;
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("=== WORDS IN DATABASE ===\n\n");
+
+    try (PreparedStatement ps = connection.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        boolean found = false;
+
+        while (rs.next()) {
+            found = true;
+
+            long id = rs.getLong("id");
+            String word = rs.getString("word");
+            long total = rs.getLong("total_count");
+            long start = rs.getLong("start_count");
+            long end = rs.getLong("end_count");
+
+            sb.append("ID: ").append(id).append("\n");
+            sb.append("Word: ").append(word).append("\n");
+            sb.append("Total Count: ").append(total).append("\n");
+            sb.append("Start Count: ").append(start).append("\n");
+            sb.append("End Count: ").append(end).append("\n");
+            sb.append("------------------------\n");
+        }
+
+        if (!found) {
+            sb.append("No words found.");
+        }
+    }
+
+    return sb.toString();
+}
 
 //TODO: Keep track of what sentences have been generated so your user can look for duplicates
 
