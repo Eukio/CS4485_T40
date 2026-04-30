@@ -19,6 +19,8 @@ import com.example.test.service.BookFolderImporter;
 import com.example.test.util.ConfigLoader;
 import com.example.test.util.CorpusLoader;
 
+import java.io.FileInputStream;
+
 
 /**
  * Program entry point.
@@ -81,8 +83,17 @@ public class Main {
             ex.printStackTrace();
         }
 
+
+
+
+
         out.println("\n--- Running tests for backend classes ---");
         try(DatabaseManager db = new DatabaseManager(new DatabaseConfig(jdbcUrl, username, password))){
+
+            //test to print out test data
+
+            out.println(db.getAllFilesStatsString());
+
             testWordService(db);
             testSentenceBuilder(db);
             testSentenceHistory(db);
@@ -194,6 +205,12 @@ public class Main {
         }catch(Exception e){
             System.err.println("BPEMarkovChain test failed. Not worth my helldiver hours. reason: " + e.getMessage());
             e.printStackTrace();
-    }}
+        }
+    }
+    private Properties loadConfig() throws IOException {
+        Properties props = new Properties();
+        props.load(new FileInputStream("configsql.properties"));
+        return props;
+    }
     
 }
