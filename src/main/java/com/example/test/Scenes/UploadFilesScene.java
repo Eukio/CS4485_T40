@@ -21,6 +21,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
+
+//Christian Verderame
+
+
 public class UploadFilesScene extends BorderPane {
 
     private Stage window;
@@ -37,6 +41,11 @@ public class UploadFilesScene extends BorderPane {
         setUploadFilesScene(mainApp);
     }
 
+    //Christian Verderame
+    /**
+        upload scenes for the file insertion and file history page
+
+     */
     public void setUploadFilesScene(HelloApplication mainApp) throws IOException {
 
         Text welcome0 = new Text("Welcome to_");

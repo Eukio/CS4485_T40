@@ -40,6 +40,7 @@ public class DatabaseManager implements AutoCloseable {
         return connection;
     }
 
+    //Christian Verderame
     /**
      * Checks whether a file has already been imported.
      *
@@ -55,7 +56,7 @@ public class DatabaseManager implements AutoCloseable {
             }
         }
     }
-
+    //Christian Verderame
     /**
      * Inserts a row into imported_files, or updates it if the same filename already exists.
      *
@@ -281,7 +282,7 @@ public class DatabaseManager implements AutoCloseable {
         }
     }
 
-
+//Christian Verderame
     /**
      * Combines all details about a word:
      * - its info
@@ -294,6 +295,7 @@ public class DatabaseManager implements AutoCloseable {
         public java.util.List<WordNeighbor> previousWords;
     }
 
+    //Christian Verderame
     /**
      * Finds a word in the database using the TEXT (not id).
      *
@@ -336,7 +338,7 @@ public class DatabaseManager implements AutoCloseable {
         throw new SQLException("Word not found: " + word);
     }
 
-
+    //Christian Verderame
     /**
      * Finds all words that come AFTER the given word.
      *
@@ -378,7 +380,7 @@ public class DatabaseManager implements AutoCloseable {
         return list;
     }
 
-
+    //Christian Verderame
     /**
      * Finds all words that come BEFORE the given word.
      *
@@ -418,7 +420,7 @@ public class DatabaseManager implements AutoCloseable {
         return list;
     }
 
-
+//Christian Verderame
     /**
      * Main function that combines everything.
      *
@@ -576,9 +578,13 @@ public class DatabaseManager implements AutoCloseable {
         return sb.toString();
     }
 
+//Christian Verderame
+/**
+    gets all words in the database with its count, starting count, and ending count
+ return a string of all the values. Current 50 words max
 
+*/
 
-//TODO: String that sees a list of all words in the system and information about them
 public String getAllWords() throws SQLException {
 
     String sql = """
