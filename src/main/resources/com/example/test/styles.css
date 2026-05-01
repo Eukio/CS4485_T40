@@ -131,3 +131,18 @@
     -fx-font-size: 24px;
     -fx-fill: #1a1a1a;
 }
+
+/* ── Search button ───────────────────────────────────────── */
+.search-button {
+    -fx-background-color: #99AEE2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-pref-width: 44;
+    -fx-pref-height: 44;
+    -fx-cursor: hand;
+}
+
+.search-button:hover {
+    -fx-background-color: #466CCC;
+}

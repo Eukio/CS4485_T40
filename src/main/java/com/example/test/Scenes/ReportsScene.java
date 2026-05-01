@@ -21,6 +21,10 @@ import com.example.test.db.DatabaseConfig;
 import com.example.test.db.DatabaseManager;
 import com.example.test.util.ConfigLoader;
 
+import javafx.scene.control.Label;
+import javafx.scene.text.TextFlow;
+import javafx.geometry.Pos;
+
 public class ReportsScene extends BorderPane {
 
     /*
@@ -50,16 +54,24 @@ public class ReportsScene extends BorderPane {
      * Builds the full Reports page.
      */
     public void setReportScenePage() {
-        Text welcomeLine = new Text("Reports_\n");
+        Text welcomeLine = new Text("Reports");
         welcomeLine.getStyleClass().add("hero-text");
 
-        VBox reportSceneBox = new VBox(welcomeLine, reportContainer());
-        reportSceneBox.setPadding(new Insets(20));
-        reportSceneBox.setSpacing(20);
+        Text welcomeAccent = new Text("_");
+        welcomeAccent.getStyleClass().add("hero-text-accent");
+
+        TextFlow heroText = new TextFlow(welcomeLine, welcomeAccent);
+
+        Label subtitleLabel = new Label("Search and explore word data from the database");
+        subtitleLabel.getStyleClass().add("upload-label");
+
+        VBox reportSceneBox = new VBox(24, heroText, subtitleLabel, reportContainer());
+        reportSceneBox.setPadding(new Insets(0, 72, 40, 72));
+        reportSceneBox.setAlignment(Pos.CENTER_LEFT);
 
         setCenter(reportSceneBox);
+        setStyle("-fx-background-color: white;");
     }
-
     /*
      * Main container:
      * left side = search + word details
@@ -116,7 +128,7 @@ public class ReportsScene extends BorderPane {
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
         Button searchButton = new Button("o");
-        searchButton.setPrefSize(44, 44);
+        searchButton.getStyleClass().add("search-button");
 
         searchButton.setOnAction(e -> {
             String word = searchField.getText().trim();
@@ -244,89 +256,49 @@ public class ReportsScene extends BorderPane {
         Button alphabeticalButton = new Button("Alpha");
         Button frequencyButton = new Button("Freq");
 
-        alphabeticalButton.getStyleClass().add("suggestion-button");
-        frequencyButton.getStyleClass().add("suggestion-button");
+        alphabeticalButton.getStyleClass().add("button");
+        frequencyButton.getStyleClass().add("button");
 
-        alphabeticalButton.setStyle(
-                "-fx-background-color: " + HelloApplication.LIGHTBLUE + ";" +
-                        "-fx-background-radius: 20;" +
-                        "-fx-border-radius: 20;"
-        );
+        // remove all the inline setStyle calls — handled by CSS
 
-        frequencyButton.setStyle(
-                "-fx-background-color: " + HelloApplication.LIGHTBLUE + ";" +
-                        "-fx-background-radius: 20;" +
-                        "-fx-border-radius: 20;"
-        );
-
-        //change between ascending and descending
-        //private boolean isAscendingA = true;
         alphabeticalButton.setOnAction(e -> {
             try {
                 Properties props = ConfigLoader.loadConfig();
-
                 DatabaseConfig config = new DatabaseConfig(
                         props.getProperty("db.jdbcUrl"),
                         props.getProperty("db.username"),
                         props.getProperty("db.password")
                 );
-
                 try (DatabaseManager db = new DatabaseManager(config)) {
-                    String result;
-                    if (isAscendingA) {
-                        result = db.getAllWordsAlphaASC();
-                    } else {
-                        result = db.getAllWordsAlphaDESC();
-                    }
-
-                    wordsText.setText(result);
-                    isAscendingA = !isAscendingA; // toggle
-
-
-
-                    //wordsText.setText(db.getAllWordsAlpha());
+                    wordsText.setText(isAscendingA ? db.getAllWordsAlphaASC() : db.getAllWordsAlphaDESC());
+                    isAscendingA = !isAscendingA;
                 }
-
             } catch (Exception ex) {
                 wordsText.setText("Could not load words alphabetically: " + ex.getMessage());
                 ex.printStackTrace();
             }
         });
 
-        //change between ascending and descending
-        //private boolean isAscendingF = true;
-
         frequencyButton.setOnAction(e -> {
             try {
                 Properties props = ConfigLoader.loadConfig();
-
                 DatabaseConfig config = new DatabaseConfig(
                         props.getProperty("db.jdbcUrl"),
                         props.getProperty("db.username"),
                         props.getProperty("db.password")
                 );
-
                 try (DatabaseManager db = new DatabaseManager(config)) {
-                    String result;
-                    if (isAscendingF) {
-                        result = db.getAllWordsFrequencyASC();
-                    } else {
-                        result = db.getAllWordsFrequencyDESC();
-                    }
-
-                    wordsText.setText(result);
-                    isAscendingF = !isAscendingF; // toggle
+                    wordsText.setText(isAscendingF ? db.getAllWordsFrequencyASC() : db.getAllWordsFrequencyDESC());
+                    isAscendingF = !isAscendingF;
                 }
-
             } catch (Exception ex) {
                 wordsText.setText("Could not load words by frequency: " + ex.getMessage());
                 ex.printStackTrace();
             }
         });
 
-        return new HBox(20, alphabeticalButton, frequencyButton);
+        return new HBox(12, alphabeticalButton, frequencyButton);
     }
-
     /*
      * Scrollable word bank.
      * The text changes when Alpha or Freq is clicked.
