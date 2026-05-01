@@ -67,17 +67,15 @@ public class BuildSentencesScene extends BorderPane {
 
         // ================= SENTENCE HISTORY =================
         VBox historyItemsBox = new VBox(12);
-        historyItemsBox.setPadding(new Insets(12));
-        historyItemsBox.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-background-radius: 10;"
-        );
+        historyItemsBox.setPadding(new Insets(6));
 
         ScrollPane historyScroll = new ScrollPane(historyItemsBox);
         historyScroll.setFitToWidth(true);
         historyScroll.setPrefHeight(200);
-        historyScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
-
+        historyScroll.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background: white;"
+        );
         // Start collapsed
         historyScroll.setVisible(false);
         historyScroll.setManaged(false);
@@ -131,7 +129,12 @@ public class BuildSentencesScene extends BorderPane {
                 Label historyEntry = new Label(sentence);
                 historyEntry.setWrapText(true);
                 historyEntry.setMaxWidth(Double.MAX_VALUE);
-                historyEntry.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 14px;");
+                historyEntry.setStyle(
+                        "-fx-font-family: 'Verdana';" +
+                                "-fx-font-size: 14px;" +
+                                "-fx-text-fill: #1a1a1a;" +
+                                "-fx-background-color: transparent;"
+                );
                 historyItemsBox.getChildren().add(0, historyEntry);
 
                 // Save to DB
