@@ -43,11 +43,9 @@ public class BuildSentencesScene extends BorderPane {
         // ================= BUTTONS =================
         Button generateButton = new Button("Generate Sentence");
         generateButton.getStyleClass().add("generate-button");
-        generateButton.setPrefSize(180, 50);
 
         Button algoButton = new Button(algoNames[algorithmOptions[0]]);
         algoButton.getStyleClass().add("algo-button");
-        algoButton.setPrefSize(180, 50);
 
         algoButton.setOnAction(e -> {
             algorithmOptions[0] = (algorithmOptions[0] + 1) % algoNames.length;
@@ -63,44 +61,41 @@ public class BuildSentencesScene extends BorderPane {
         outputField.setStyle(
                 "-fx-background-color: #D3DFFF;" +
                         "-fx-background-radius: 12;" +
-                        "-fx-padding: 20;" +
-                        "-fx-border-color: transparent;"
+                        "-fx-padding: 5;" +
+                        "-fx-border-color: transparent;" +
+                        "-fx-font-size: 20px;"
         );
 
         // ================= SENTENCE HISTORY =================
         VBox historyItemsBox = new VBox(12);
-        historyItemsBox.setPadding(new Insets(12));
-        historyItemsBox.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-background-radius: 10;"
-        );
+        historyItemsBox.setPadding(new Insets(6));
 
         ScrollPane historyScroll = new ScrollPane(historyItemsBox);
         historyScroll.setFitToWidth(true);
         historyScroll.setPrefHeight(200);
-        historyScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+        historyScroll.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background: white;"
+        );
+        // Start collapsed
+        historyScroll.setVisible(false);
+        historyScroll.setManaged(false);
 
         Label historyTitle = new Label("Sentence History");
         historyTitle.setStyle(
                 "-fx-font-family: 'Verdana';" +
-                        "-fx-font-size: 20px;" +
-                        "-fx-font-weight: bold;"
+                        "-fx-font-size: 20px;"
         );
 
         // Collapse/expand toggle
-        final boolean[] expanded = {true};
-        Button toggleButton = new Button("∨");
-        toggleButton.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-text-fill: #4e60ba;" +
-                        "-fx-font-size: 18px;" +
-                        "-fx-cursor: hand;"
-        );
+        final boolean[] expanded = {false};
+        Button toggleButton = new Button("Show");
+        toggleButton.getStyleClass().add("search-button");
         toggleButton.setOnAction(e -> {
             expanded[0] = !expanded[0];
             historyScroll.setVisible(expanded[0]);
             historyScroll.setManaged(expanded[0]);
-            toggleButton.setText(expanded[0] ? "∨" : "∧");
+            toggleButton.setText(expanded[0] ? "Hide" : "Show");
         });
 
         Region spacer = new Region();
@@ -129,7 +124,12 @@ public class BuildSentencesScene extends BorderPane {
                 Label historyEntry = new Label(sentence);
                 historyEntry.setWrapText(true);
                 historyEntry.setMaxWidth(Double.MAX_VALUE);
-                historyEntry.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 14px;");
+                historyEntry.setStyle(
+                        "-fx-font-family: 'Verdana';" +
+                                "-fx-font-size: 14px;" +
+                                "-fx-text-fill: #1a1a1a;" +
+                                "-fx-background-color: transparent;"
+                );
                 historyItemsBox.getChildren().add(0, historyEntry);
 
                 // Save to DB
@@ -149,7 +149,7 @@ public class BuildSentencesScene extends BorderPane {
         buttonRow.setAlignment(Pos.CENTER_LEFT);
 
         VBox centerBox = new VBox(16, heroText, subtitleLabel, buttonRow, outputField, historyPanel);
-        centerBox.setPadding(new Insets(0, 72, 24, 72));
+        centerBox.setPadding(new Insets(20, 72, 24, 72));
         centerBox.setAlignment(Pos.CENTER_LEFT);
 
         setCenter(centerBox);
