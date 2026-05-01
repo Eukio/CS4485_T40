@@ -118,3 +118,16 @@
     -fx-padding: 12;
     -fx-spacing: 12;
 }
+/* ── Typing area label ───────────────────────────────────── */
+.typing-label {
+    -fx-font-family: "Verdana";
+    -fx-font-size: 16px;
+    -fx-fill: #1a1a1a;
+}
+
+/* ── Word bank title ─────────────────────────────────────── */
+.word-bank-title {
+    -fx-font-family: "Verdana";
+    -fx-font-size: 24px;
+    -fx-fill: #1a1a1a;
+}

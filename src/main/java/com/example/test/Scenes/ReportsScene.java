@@ -41,7 +41,7 @@ public class ReportsScene extends BorderPane {
     private Text wordsText;
 
     public ReportsScene(HelloApplication mainApp) {
-        NavBar navBar = new NavBar(mainApp);
+        NavBar navBar = new NavBar(mainApp, "reports");
         setTop(navBar);
         setReportScenePage();
     }

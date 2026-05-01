@@ -11,7 +11,7 @@ public class NavBar extends HBox {
 
     private Button activeButton = null;
 
-    public NavBar(HelloApplication mainApp) {
+    public NavBar(HelloApplication mainApp, String activeScene) {
         Button home         = createNavButton("Home");
         Button upload       = createNavButton("Upload Files");
         Button autocomplete = createNavButton("Autocomplete");
@@ -21,7 +21,14 @@ public class NavBar extends HBox {
         setStyle("-fx-background-color: " + HelloApplication.DARKNAVY + ";");
         setPrefHeight(48);
 
-        setActive(home);
+        // Set active based on which scene we're on
+        switch (activeScene) {
+            case "upload"       -> setActive(upload);
+            case "autocomplete" -> setActive(autocomplete);
+            case "build"        -> setActive(build);
+            case "reports"      -> setActive(reports);
+            default             -> setActive(home);
+        }
 
         home.setOnAction(e -> {
             setActive(home); mainApp.showHomeScene();
