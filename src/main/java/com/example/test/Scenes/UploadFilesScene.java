@@ -16,6 +16,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.text.TextFlow;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,18 +49,31 @@ public class UploadFilesScene extends BorderPane {
      */
     public void setUploadFilesScene(HelloApplication mainApp) throws IOException {
 
-        Text welcome0 = new Text("Welcome to_");
+        // Replace the two Text nodes and the VBox with:
+        Text welcome0 = new Text("Upload ");
         welcome0.getStyleClass().add("hero-text");
 
-        Text welcome1 = new Text("Sentence Builder");
+        Text welcome1 = new Text("Files_");
         welcome1.getStyleClass().add("hero-text-accent");
+
+        TextFlow heroText = new TextFlow(welcome0, welcome1);
 
         Label uploadLabel = new Label("Upload your text file here!");
         uploadLabel.getStyleClass().add("upload-label");
 
         // ================= FILE IMPORT BUTTON =================
         Button importFileButton = new Button("Click Here");
-        importFileButton.setPrefWidth(460);
+        importFileButton.setPrefWidth(520);
+        importFileButton.setStyle("-fx-background-radius: 10px;");
+
+        BorderStroke outerStroke = new BorderStroke(
+                Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(1)
+        );
+        BorderStroke innerStroke = new BorderStroke(
+                Color.BLACK, BorderStrokeStyle.DASHED, new CornerRadii(10), new BorderWidths(1), new Insets(4)
+        );
+        importFileButton.setBorder(new Border(outerStroke, innerStroke));
+
 
         importFileButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
@@ -166,8 +180,7 @@ public class UploadFilesScene extends BorderPane {
 
         VBox box = new VBox(
                 10,
-                welcome0,
-                welcome1,
+                heroText,
                 uploadLabel,
                 importFileButton,
                 buttonContainer
@@ -181,12 +194,13 @@ public class UploadFilesScene extends BorderPane {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox app = new HBox(box, spacer, fileDetailsPane);
-        app.setSpacing(20);
-        app.setAlignment(Pos.CENTER_LEFT);
-        app.setPadding(new Insets(0, 20, 0, 40));
+        //center the left vbox
+        VBox centerWrapper = new VBox(box);
+        centerWrapper.setAlignment(Pos.CENTER_LEFT);
+        centerWrapper.setPadding(new Insets(0, 20, 0, 72));
 
-        setCenter(app);
+        setCenter(centerWrapper);
+        setRight(fileDetailsPane);
     }
 
     // ================= RIGHT PANEL =================

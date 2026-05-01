@@ -84,8 +84,8 @@
     -fx-background-color: #c1c8e6;
     -fx-text-fill: #4e60ba;
     -fx-background-radius: 12;
-    -fx-pref-width: 240; /* 200 * 1.2 */
-    -fx-pref-height: 72; /* 60 * 1.2 */
+    -fx-pref-width: 200;
+    -fx-pref-height: 60;
     -fx-cursor: hand;
 }
 
@@ -97,8 +97,8 @@
     -fx-background-color: #4e60ba;
     -fx-text-fill: white;
     -fx-background-radius: 12;
-    -fx-pref-width: 240; /* 200 * 1.2 */
-    -fx-pref-height: 72; /* 60 * 1.2 */
+    -fx-pref-width: 200;
+    -fx-pref-height: 60;
     -fx-cursor: hand;
 }
 
