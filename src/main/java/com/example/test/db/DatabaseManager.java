@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * Central database access class.
  *
@@ -591,13 +592,13 @@ public class DatabaseManager implements AutoCloseable {
 
 */
 
-public String getAllWords() throws SQLException {
+public String getAllWordsAlpha() throws SQLException {
 
     String sql = """
         SELECT 
             id, word, total_count, start_count, end_count
         FROM words
-        ORDER BY id
+        ORDER BY word DESC 
         LIMIT 50
     """;
 
@@ -633,6 +634,50 @@ public String getAllWords() throws SQLException {
 
     return sb.toString();
 }
+
+    public String getAllWordsFrequency() throws SQLException {
+
+        String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        ORDER BY total_count DESC 
+        LIMIT 50
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== WORDS IN DATABASE ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                long id = rs.getLong("id");
+                String word = rs.getString("word");
+                long total = rs.getLong("total_count");
+                long start = rs.getLong("start_count");
+                long end = rs.getLong("end_count");
+
+                sb.append("ID: ").append(id).append("\n");
+                sb.append("Word: ").append(word).append("\n");
+                sb.append("Total Count: ").append(total).append("\n");
+                sb.append("Start Count: ").append(start).append("\n");
+                sb.append("End Count: ").append(end).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No words found.");
+            }
+        }
+
+        return sb.toString();
+    }
+
 
 //TODO: Keep track of what sentences have been generated so your user can look for duplicates
 
