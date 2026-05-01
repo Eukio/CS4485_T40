@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * Central database access class.
  *
@@ -450,6 +451,12 @@ public class DatabaseManager implements AutoCloseable {
      * Simple debug function to print everything about a word.
      */
     public String printWordDetails(String word) throws SQLException {
+
+        String[] arrOfStr = word.split(" ");
+        if(arrOfStr.length > 1){
+            return "" + word + " needs to be a single word";
+        }
+
         WordDetails d = getWordDetails(word);
 
         if (d == null) {
@@ -585,14 +592,15 @@ public class DatabaseManager implements AutoCloseable {
 
 */
 
-public String getAllWords() throws SQLException {
+public String getAllWordsAlphaDESC() throws SQLException {
 
     String sql = """
         SELECT 
             id, word, total_count, start_count, end_count
         FROM words
-        ORDER BY id
-        LIMIT 50
+        WHERE word NOT IN ('[BEGIN]', '[END]')
+        ORDER BY word DESC 
+        LIMIT 200
     """;
 
     StringBuilder sb = new StringBuilder();
@@ -627,6 +635,139 @@ public String getAllWords() throws SQLException {
 
     return sb.toString();
 }
+
+    public String getAllWordsAlphaASC() throws SQLException {
+
+        String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        WHERE word NOT IN ('[BEGIN]', '[END]')
+        ORDER BY word 
+        LIMIT 200
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== WORDS IN DATABASE ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                long id = rs.getLong("id");
+                String word = rs.getString("word");
+                long total = rs.getLong("total_count");
+                long start = rs.getLong("start_count");
+                long end = rs.getLong("end_count");
+
+                sb.append("ID: ").append(id).append("\n");
+                sb.append("Word: ").append(word).append("\n");
+                sb.append("Total Count: ").append(total).append("\n");
+                sb.append("Start Count: ").append(start).append("\n");
+                sb.append("End Count: ").append(end).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No words found.");
+            }
+        }
+
+        return sb.toString();
+    }
+
+
+    public String getAllWordsFrequencyDESC() throws SQLException {
+
+        String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        WHERE word NOT IN ('[BEGIN]', '[END]')
+        ORDER BY total_count DESC 
+        LIMIT 200
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== WORDS IN DATABASE ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                long id = rs.getLong("id");
+                String word = rs.getString("word");
+                long total = rs.getLong("total_count");
+                long start = rs.getLong("start_count");
+                long end = rs.getLong("end_count");
+
+                sb.append("ID: ").append(id).append("\n");
+                sb.append("Word: ").append(word).append("\n");
+                sb.append("Total Count: ").append(total).append("\n");
+                sb.append("Start Count: ").append(start).append("\n");
+                sb.append("End Count: ").append(end).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No words found.");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public String getAllWordsFrequencyASC() throws SQLException {
+
+        String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        WHERE word NOT IN ('[BEGIN]', '[END]')
+        ORDER BY total_count 
+        LIMIT 200
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== WORDS IN DATABASE ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                long id = rs.getLong("id");
+                String word = rs.getString("word");
+                long total = rs.getLong("total_count");
+                long start = rs.getLong("start_count");
+                long end = rs.getLong("end_count");
+
+                sb.append("ID: ").append(id).append("\n");
+                sb.append("Word: ").append(word).append("\n");
+                sb.append("Total Count: ").append(total).append("\n");
+                sb.append("Start Count: ").append(start).append("\n");
+                sb.append("End Count: ").append(end).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No words found.");
+            }
+        }
+
+        return sb.toString();
+    }
 
 //TODO: Keep track of what sentences have been generated so your user can look for duplicates
 
