@@ -29,6 +29,11 @@ public class ReportsScene extends BorderPane {
      */
     private Text wordDetailsText;
 
+    //change between ascending and descending alpha
+    private boolean isAscendingA = true;
+
+    //change between ascending and descending frequency
+    private boolean isAscendingF = true;
     /*
      * This text is updated when the user clicks Alpha or Freq.
      * It must be a class variable so the buttons can change it.
@@ -254,6 +259,8 @@ public class ReportsScene extends BorderPane {
                         "-fx-border-radius: 20;"
         );
 
+        //change between ascending and descending
+        //private boolean isAscendingA = true;
         alphabeticalButton.setOnAction(e -> {
             try {
                 Properties props = ConfigLoader.loadConfig();
@@ -265,7 +272,19 @@ public class ReportsScene extends BorderPane {
                 );
 
                 try (DatabaseManager db = new DatabaseManager(config)) {
-                    wordsText.setText(db.getAllWordsAlpha());
+                    String result;
+                    if (isAscendingA) {
+                        result = db.getAllWordsAlphaASC();
+                    } else {
+                        result = db.getAllWordsAlphaDESC();
+                    }
+
+                    wordsText.setText(result);
+                    isAscendingA = !isAscendingA; // toggle
+
+
+
+                    //wordsText.setText(db.getAllWordsAlpha());
                 }
 
             } catch (Exception ex) {
@@ -273,6 +292,9 @@ public class ReportsScene extends BorderPane {
                 ex.printStackTrace();
             }
         });
+
+        //change between ascending and descending
+        //private boolean isAscendingF = true;
 
         frequencyButton.setOnAction(e -> {
             try {
@@ -285,7 +307,15 @@ public class ReportsScene extends BorderPane {
                 );
 
                 try (DatabaseManager db = new DatabaseManager(config)) {
-                    wordsText.setText(db.getAllWordsFrequency());
+                    String result;
+                    if (isAscendingF) {
+                        result = db.getAllWordsFrequencyASC();
+                    } else {
+                        result = db.getAllWordsFrequencyDESC();
+                    }
+
+                    wordsText.setText(result);
+                    isAscendingF = !isAscendingF; // toggle
                 }
 
             } catch (Exception ex) {

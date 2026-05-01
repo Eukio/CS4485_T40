@@ -592,14 +592,14 @@ public class DatabaseManager implements AutoCloseable {
 
 */
 
-public String getAllWordsAlpha() throws SQLException {
+public String getAllWordsAlphaDESC() throws SQLException {
 
     String sql = """
         SELECT 
             id, word, total_count, start_count, end_count
         FROM words
         ORDER BY word DESC 
-        LIMIT 50
+        LIMIT 200
     """;
 
     StringBuilder sb = new StringBuilder();
@@ -635,14 +635,14 @@ public String getAllWordsAlpha() throws SQLException {
     return sb.toString();
 }
 
-    public String getAllWordsFrequency() throws SQLException {
+    public String getAllWordsAlphaASC() throws SQLException {
 
         String sql = """
         SELECT 
             id, word, total_count, start_count, end_count
         FROM words
-        ORDER BY total_count DESC 
-        LIMIT 50
+        ORDER BY word 
+        LIMIT 200
     """;
 
         StringBuilder sb = new StringBuilder();
@@ -678,6 +678,92 @@ public String getAllWordsAlpha() throws SQLException {
         return sb.toString();
     }
 
+
+    public String getAllWordsFrequencyDESC() throws SQLException {
+
+        String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        ORDER BY total_count DESC 
+        LIMIT 200
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== WORDS IN DATABASE ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                long id = rs.getLong("id");
+                String word = rs.getString("word");
+                long total = rs.getLong("total_count");
+                long start = rs.getLong("start_count");
+                long end = rs.getLong("end_count");
+
+                sb.append("ID: ").append(id).append("\n");
+                sb.append("Word: ").append(word).append("\n");
+                sb.append("Total Count: ").append(total).append("\n");
+                sb.append("Start Count: ").append(start).append("\n");
+                sb.append("End Count: ").append(end).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No words found.");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public String getAllWordsFrequencyASC() throws SQLException {
+
+        String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        ORDER BY total_count 
+        LIMIT 200
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== WORDS IN DATABASE ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                long id = rs.getLong("id");
+                String word = rs.getString("word");
+                long total = rs.getLong("total_count");
+                long start = rs.getLong("start_count");
+                long end = rs.getLong("end_count");
+
+                sb.append("ID: ").append(id).append("\n");
+                sb.append("Word: ").append(word).append("\n");
+                sb.append("Total Count: ").append(total).append("\n");
+                sb.append("Start Count: ").append(start).append("\n");
+                sb.append("End Count: ").append(end).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No words found.");
+            }
+        }
+
+        return sb.toString();
+    }
 
 //TODO: Keep track of what sentences have been generated so your user can look for duplicates
 
