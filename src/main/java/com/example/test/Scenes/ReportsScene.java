@@ -66,7 +66,7 @@ public class ReportsScene extends BorderPane {
         subtitleLabel.getStyleClass().add("upload-label");
 
         VBox reportSceneBox = new VBox(24, heroText, subtitleLabel, reportContainer());
-        reportSceneBox.setPadding(new Insets(0, 72, 40, 72));
+        reportSceneBox.setPadding(new Insets(30, 72, 40, 72));
         reportSceneBox.setAlignment(Pos.CENTER_LEFT);
 
         setCenter(reportSceneBox);
@@ -127,7 +127,7 @@ public class ReportsScene extends BorderPane {
 
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
-        Button searchButton = new Button("o");
+        Button searchButton = new Button("Search");
         searchButton.getStyleClass().add("search-button");
 
         searchButton.setOnAction(e -> {

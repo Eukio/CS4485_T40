@@ -43,11 +43,9 @@ public class BuildSentencesScene extends BorderPane {
         // ================= BUTTONS =================
         Button generateButton = new Button("Generate Sentence");
         generateButton.getStyleClass().add("generate-button");
-        generateButton.setPrefSize(180, 50);
 
         Button algoButton = new Button(algoNames[algorithmOptions[0]]);
         algoButton.getStyleClass().add("algo-button");
-        algoButton.setPrefSize(180, 50);
 
         algoButton.setOnAction(e -> {
             algorithmOptions[0] = (algorithmOptions[0] + 1) % algoNames.length;
@@ -63,7 +61,7 @@ public class BuildSentencesScene extends BorderPane {
         outputField.setStyle(
                 "-fx-background-color: #D3DFFF;" +
                         "-fx-background-radius: 12;" +
-                        "-fx-padding: 20;" +
+                        "-fx-padding: 5;" +
                         "-fx-border-color: transparent;"
         );
 
@@ -80,27 +78,31 @@ public class BuildSentencesScene extends BorderPane {
         historyScroll.setPrefHeight(200);
         historyScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
 
+        // Start collapsed
+        historyScroll.setVisible(false);
+        historyScroll.setManaged(false);
+
         Label historyTitle = new Label("Sentence History");
         historyTitle.setStyle(
                 "-fx-font-family: 'Verdana';" +
-                        "-fx-font-size: 20px;" +
-                        "-fx-font-weight: bold;"
+                        "-fx-font-size: 20px;"
         );
 
         // Collapse/expand toggle
-        final boolean[] expanded = {true};
-        Button toggleButton = new Button("∨");
-        toggleButton.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-text-fill: #4e60ba;" +
-                        "-fx-font-size: 18px;" +
-                        "-fx-cursor: hand;"
-        );
+        final boolean[] expanded = {false};
+        Button toggleButton = new Button("Show");
+        toggleButton.getStyleClass().add("search-button");
+//        toggleButton.setStyle(
+//                "-fx-background-color: transparent;" +
+//                        "-fx-text-fill: #4e60ba;" +
+//                        "-fx-font-size: 18px;" +
+//                        "-fx-cursor: hand;"
+//        );
         toggleButton.setOnAction(e -> {
             expanded[0] = !expanded[0];
             historyScroll.setVisible(expanded[0]);
             historyScroll.setManaged(expanded[0]);
-            toggleButton.setText(expanded[0] ? "∨" : "∧");
+            toggleButton.setText(expanded[0] ? "Hide" : "Show");
         });
 
         Region spacer = new Region();
@@ -149,7 +151,7 @@ public class BuildSentencesScene extends BorderPane {
         buttonRow.setAlignment(Pos.CENTER_LEFT);
 
         VBox centerBox = new VBox(16, heroText, subtitleLabel, buttonRow, outputField, historyPanel);
-        centerBox.setPadding(new Insets(0, 72, 24, 72));
+        centerBox.setPadding(new Insets(20, 72, 24, 72));
         centerBox.setAlignment(Pos.CENTER_LEFT);
 
         setCenter(centerBox);

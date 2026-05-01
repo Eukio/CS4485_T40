@@ -37,7 +37,7 @@ public class AutoCompleteScene extends BorderPane {
     public void setAutoCompleteScene(HelloApplication mainApp) throws IOException {
         Button[] suggestionFields = new Button[suggestions];
 
-        Button algoButton = new Button("Algorithm: Greedy");
+        Button algoButton = new Button("Greedy");
         algoButton.getStyleClass().add("algo-button");
         algoButton.setPrefSize(240, 60);
         algoButton.setBackground(new Background(new BackgroundFill(Color.web("#D3DFFF"), new CornerRadii(10), new Insets(10))));
@@ -57,7 +57,7 @@ public class AutoCompleteScene extends BorderPane {
         int[] algorithmOptions = {0};
         algoButton.setOnAction(event -> {
             algorithmOptions[0] = (algorithmOptions[0] + 1) % maxAlgo;
-            algoButton.setText("Algorithm: " + algoNames[algorithmOptions[0]]);
+            algoButton.setText(algoNames[algorithmOptions[0]]);
             String text = typing.getText().trim();
             if (!text.isEmpty()) {
                 String lastWord = text.contains(" ") ?

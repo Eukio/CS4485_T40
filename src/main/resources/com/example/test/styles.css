@@ -138,10 +138,10 @@
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 20;
-    -fx-pref-width: 44;
-    -fx-pref-height: 44;
+    -fx-padding: 10 20 10 20;
     -fx-cursor: hand;
 }
+
 
 .search-button:hover {
     -fx-background-color: #466CCC;
