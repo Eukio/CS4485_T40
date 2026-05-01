@@ -35,6 +35,8 @@ public class AutoCompleteScene extends BorderPane {
     }
 
     public void setAutoCompleteScene(HelloApplication mainApp) throws IOException {
+        setStyle("-fx-background-color: white;");
+
         Button[] suggestionFields = new Button[suggestions];
 
         Button algoButton = new Button("Greedy");
@@ -49,6 +51,11 @@ public class AutoCompleteScene extends BorderPane {
         ScrollPane wordBankScroll = createRightWordBank(suggestionFields);
         wordBankScroll.setFitToWidth(true);
         wordBankScroll.setPrefHeight(320);
+        wordBankScroll.setStyle(
+                "-fx-background-color: #c1c8e6;" +
+                        "-fx-background: #c1c8e6;" +
+                        "-fx-border-color: transparent;"
+        );
 
         VBox left = createLeftVBox(algoButton, typing, mainApp);
 //        left.setPadding(new Insets(10));
@@ -99,6 +106,7 @@ public class AutoCompleteScene extends BorderPane {
         wordBank.getStyleClass().add("word-bank");
         wordBank.setSpacing(12);
         wordBank.setPadding(new Insets(12));
+        wordBank.setMaxHeight(Double.MAX_VALUE);
 
         return new ScrollPane(wordBank);
     }

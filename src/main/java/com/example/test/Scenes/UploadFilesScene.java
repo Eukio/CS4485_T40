@@ -48,6 +48,7 @@ public class UploadFilesScene extends BorderPane {
 
      */
     public void setUploadFilesScene(HelloApplication mainApp) throws IOException {
+        setStyle("-fx-background-color: white;");
 
         // Replace the two Text nodes and the VBox with:
         Text welcome0 = new Text("Upload ");
@@ -209,9 +210,9 @@ public class UploadFilesScene extends BorderPane {
         Text fileTitleText = new Text("File Details");
         fileTitleText.getStyleClass().add("subtitle-text");
 
-        //assign to class field
         fileDetailsText = new Text("Click 'File Info' to view imported file data.");
         fileDetailsText.setWrappingWidth(280);
+        fileDetailsText.setStyle("-fx-fill: #1a1a1a; -fx-font-family: 'Verdana'; -fx-font-size: 14px;");
 
         VBox fileDetailsBox = new VBox(10, fileTitleText, fileDetailsText);
         fileDetailsBox.setPadding(new Insets(10));
@@ -221,7 +222,39 @@ public class UploadFilesScene extends BorderPane {
         scrollBox.setPrefViewportHeight(320);
         scrollBox.setFitToWidth(true);
         scrollBox.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollBox.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background: white;"
+        );
 
-        return scrollBox;
+        // Wrap in a panel styled like the history box
+        HBox header = new HBox(fileTitleText);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(4, 8, 4, 8));
+
+        VBox panel = new VBox(4, header, scrollBox);
+        panel.setPadding(new Insets(10));
+        panel.setStyle(
+                "-fx-background-color: #D3DFFF;" +
+                        "-fx-background-radius: 12;"
+        );
+
+        // Wrap panel in a ScrollPane to return correct type
+        ScrollPane wrapper = new ScrollPane(panel);
+        wrapper.setFitToWidth(true);
+        wrapper.setFitToHeight(true); // fills available height
+        wrapper.setPrefViewportWidth(320);
+        wrapper.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-background: transparent;" +
+                        "-fx-border-color: transparent;"
+        );
+
+        scrollBox.setFitToHeight(true);
+        VBox.setVgrow(scrollBox, Priority.ALWAYS);
+        panel.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(panel, Priority.ALWAYS);
+
+        return wrapper;
     }
 }

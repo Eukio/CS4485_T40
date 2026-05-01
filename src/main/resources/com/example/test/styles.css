@@ -85,7 +85,7 @@
     -fx-text-fill: #4e60ba;
     -fx-background-radius: 12;
     -fx-pref-width: 200;
-    -fx-pref-height: 60;
+    -fx-pref-height: 40;
     -fx-cursor: hand;
 }
 
@@ -98,7 +98,7 @@
     -fx-text-fill: white;
     -fx-background-radius: 12;
     -fx-pref-width: 200;
-    -fx-pref-height: 60;
+    -fx-pref-height: 40;
     -fx-cursor: hand;
 }
 
@@ -107,7 +107,7 @@
 }
 
 .typing-area {
-    -fx-background-color: #c1c8e6;
+    -fx-background-color: #d3dfff;
     -fx-background-radius: 12;
     -fx-padding: 12; /* 10 * 1.2 */
 }

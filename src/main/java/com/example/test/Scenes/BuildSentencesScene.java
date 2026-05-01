@@ -62,7 +62,8 @@ public class BuildSentencesScene extends BorderPane {
                 "-fx-background-color: #D3DFFF;" +
                         "-fx-background-radius: 12;" +
                         "-fx-padding: 5;" +
-                        "-fx-border-color: transparent;"
+                        "-fx-border-color: transparent;" +
+                        "-fx-font-size: 20px;"
         );
 
         // ================= SENTENCE HISTORY =================
@@ -90,12 +91,6 @@ public class BuildSentencesScene extends BorderPane {
         final boolean[] expanded = {false};
         Button toggleButton = new Button("Show");
         toggleButton.getStyleClass().add("search-button");
-//        toggleButton.setStyle(
-//                "-fx-background-color: transparent;" +
-//                        "-fx-text-fill: #4e60ba;" +
-//                        "-fx-font-size: 18px;" +
-//                        "-fx-cursor: hand;"
-//        );
         toggleButton.setOnAction(e -> {
             expanded[0] = !expanded[0];
             historyScroll.setVisible(expanded[0]);
