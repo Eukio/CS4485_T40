@@ -175,7 +175,7 @@ public class WordService{
                 System.out.println("couldn't upload word");
             }
             //System.out.println(wordExists(word));
-            //con.commit();
+            con.commit();
         }
     }
 
@@ -244,7 +244,7 @@ public class WordService{
                 autocompleteCache.keySet().removeIf(key -> key.wordId() == prevId);
             }
 
-            //con.commit();
+            con.commit();
     }
 
 

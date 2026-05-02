@@ -1,7 +1,6 @@
 package com.example.test.Scenes;
 
 import com.example.test.HelloApplication;
-import com.example.test.backend.SentenceBuilder;
 import com.example.test.backend.SentenceHistory;
 import com.example.test.backend.WordService;
 import com.example.test.db.DatabaseManager;
@@ -19,6 +18,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -29,71 +29,53 @@ public class AutoCompleteScene extends BorderPane {
     WordService wordService;
     DatabaseManager dbManager;
 
-    private final int suggestions = 10; //placeholder for number of suggestions to show
+    private final int suggestions = 10;
     private final String[] algoNames = {"Greedy", "Random Weighted", "Temperature", "BPE Markov"};
+
     public AutoCompleteScene(HelloApplication mainApp, WordService wordService, DatabaseManager dbManager) throws IOException {
         this.wordService = wordService;
         this.dbManager = dbManager;
-        NavBar navBar = new NavBar(mainApp);
+        NavBar navBar = new NavBar(mainApp, "autocomplete");
         setTop(navBar);
         setAutoCompleteScene(mainApp);
-
     }
-    public void setAutoCompleteScene(HelloApplication mainApp) throws IOException {
-        Button[] suggestionFields = new Button[suggestions];
-        Button algoButton = new Button("Algorithm: Greedy");
-        algoButton.getStyleClass().add("algo-button");
 
-        Button generateButton = new Button("Generate Sentence");
-        generateButton.getStyleClass().add("generate-button");
+    public void setAutoCompleteScene(HelloApplication mainApp) throws IOException {
+        setStyle("-fx-background-color: white;");
+
+        Button[] suggestionFields = new Button[suggestions];
+
+        Button algoButton = new Button("Greedy");
+        algoButton.getStyleClass().add("algo-button");
+        algoButton.setPrefSize(240, 60);
+        algoButton.setBackground(new Background(new BackgroundFill(Color.web("#D3DFFF"), new CornerRadii(10), new Insets(10))));
 
         TextArea typing = new TextArea();
         typing.getStyleClass().add("typing-area");
-        typing.setPadding(new Insets(10));
+        typing.setPadding(new Insets(12));
 
         ScrollPane wordBankScroll = createRightWordBank(suggestionFields);
         wordBankScroll.setFitToWidth(true);
         wordBankScroll.setPrefHeight(320);
+        wordBankScroll.setStyle(
+                "-fx-background-color: #c1c8e6;" +
+                        "-fx-background: #c1c8e6;" +
+                        "-fx-border-color: transparent;"
+        );
 
-        VBox left = createLeftVBox(algoButton, generateButton, typing);
-        left.setPadding(new Insets(10));
-
-        TextArea reportTextArea = new TextArea();
+        VBox left = createLeftVBox(algoButton, typing, mainApp);
+//        left.setPadding(new Insets(10));
 
         int maxAlgo = 4;
         int[] algorithmOptions = {0};
         algoButton.setOnAction(event -> {
             algorithmOptions[0] = (algorithmOptions[0] + 1) % maxAlgo;
-            algoButton.setText("Algorithm: " + algoNames[algorithmOptions[0]]);
+            algoButton.setText(algoNames[algorithmOptions[0]]);
             String text = typing.getText().trim();
             if (!text.isEmpty()) {
                 String lastWord = text.contains(" ") ?
                         text.substring(text.lastIndexOf(" ") + 1) : text;
-                updateWordBank(lastWord, suggestionFields, typing, reportTextArea);
-            }
-        });
-
-        generateButton.setOnAction(event -> {
-            String text = typing.getText().trim();
-            try {
-                String cleaned = text.replaceAll("\\s*\\[END\\]\\.?$", "").replaceAll("[.!?]+$", "").trim();
-                String lastWord = cleaned.isEmpty() ? null
-                        : cleaned.contains(" ") ? cleaned.substring(cleaned.lastIndexOf(" ") + 1).trim()
-                        : cleaned;
-                out.println("Using algorithm: " + algorithmOptions[0]);
-                String sentence = new SentenceBuilder(wordService).buildSentence(lastWord, algorithmOptions[0]);
-                out.println("Generated sentence: " + sentence);
-                String current = typing.getText().trim();
-                typing.setText(current.isEmpty() ? sentence : current + " " + sentence);
-                Platform.runLater(() -> {
-                    typing.requestFocus();
-                    typing.deselect();
-                    typing.positionCaret(typing.getText().length());
-                });
-                SentenceHistory history = new SentenceHistory(dbManager);
-                history.save(sentence, algoNames[algorithmOptions[0]]);
-            } catch (Exception e) {
-                System.err.println("Error generating sentence: " + e.getMessage());
+                updateWordBank(lastWord, suggestionFields, typing);
             }
         });
 
@@ -149,21 +131,22 @@ public class AutoCompleteScene extends BorderPane {
 
                 //passes last word regardless of punctuation, returns '.' at the end...
                 String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
-                updateWordBank(lastWord, suggestionFields, typing, reportTextArea);
+                updateWordBank(lastWord, suggestionFields, typing);
             }});
 
 
-        HBox app = new HBox(left, wordBankScroll, reportTextArea);
-        app.setAlignment(Pos.CENTER_LEFT);
-
-        setCenter(app);
+        setCenter(left);
         setRight(wordBankScroll);
-        setBottom(reportTextArea);
+//        HBox app = new HBox(left, wordBankScroll);
+//        app.setAlignment(Pos.CENTER);
+//        HBox.setHgrow(left, Priority.ALWAYS);
+//
+//        setCenter(app);
     }
 
     public ScrollPane createRightWordBank(Button[] suggestionFields) throws IOException {
-        Text wordBankTitle = new Text(20, 100, "Next Word");
-        wordBankTitle.getStyleClass().add("subtitle-text");
+        Text wordBankTitle = new Text("Next Word");
+        wordBankTitle.getStyleClass().add("word-bank-title");
 
         for (int i = 0; i < suggestions; i++) {
             suggestionFields[i] = new Button();
@@ -174,53 +157,39 @@ public class AutoCompleteScene extends BorderPane {
         VBox wordBank = new VBox(wordBankTitle);
         wordBank.getChildren().addAll(suggestionFields);
         wordBank.getStyleClass().add("word-bank");
+        wordBank.setSpacing(12);
+        wordBank.setPadding(new Insets(12));
+        wordBank.setMaxHeight(Double.MAX_VALUE);
 
         return new ScrollPane(wordBank);
     }
 
-    public VBox createLeftVBox(Button algoButton, Button generateButton, TextArea typing) throws IOException {
-        Text welcome0 = new Text("Welcome to_");
+    public VBox createLeftVBox(Button algoButton, TextArea typing, HelloApplication mainApp) throws IOException {
+        Text welcome0 = new Text("Autocomplete");
         welcome0.getStyleClass().add("hero-text");
 
-        Text welcome1 = new Text("Sentence Builder");
+        Text welcome1 = new Text("_");
         welcome1.getStyleClass().add("hero-text-accent");
 
-        Text typingLabel = new Text("Start typing to see your autocomplete suggestions");
-        typingLabel.getStyleClass().add("subtitle-text");
+        TextFlow heroText = new TextFlow(welcome0, welcome1);
 
-        HBox buttons = new HBox(generateButton, algoButton);
-        buttons.setSpacing(10);
+        Label typingLabel = new Label("Start typing to see your autocomplete suggestions");
+        typingLabel.getStyleClass().add("upload-label");
 
-        return new VBox(welcome0, welcome1, typingLabel, typing, buttons);
+        HBox buttons = new HBox(12, algoButton);
+        buttons.setAlignment(Pos.CENTER_LEFT);
+
+        Button toSentenceBuilderButton = new Button("Continue");
+        toSentenceBuilderButton.getStyleClass().add("continue-button");
+        toSentenceBuilderButton.setStyle("-fx-background-color: " + HelloApplication.DARKNAVY + ";");
+        toSentenceBuilderButton.setOnAction(e -> mainApp.showBuildSentencesScene());
+
+        VBox left = new VBox(24, heroText, typingLabel, buttons, typing, toSentenceBuilderButton);
+        left.setPadding(new Insets(0, 72, 40, 72));
+        left.setAlignment(Pos.CENTER_LEFT);
+        return left;
     }
-
-    public void createAlgorithmButtons(Button algoButton, Button generateButton, HBox buttons) throws IOException {
-        // Sizing kept inline since setPrefSize can't be done in CSS for JavaFX
-        algoButton.setPrefSize(200, 60);
-        generateButton.setPrefSize(200, 60);
-        buttons.setSpacing(10);
-    }
-
-    // Typing TextArea for autocompleteScene
-//    public void createToImportSceneButton(Button toImportSceneButton, HelloApplication mainApp) throws IOException{
-//        Color color3 = Color.web("#00000040"); //Continue Button
-//        CornerRadii radii = new CornerRadii(10);
-//        toImportSceneButton.setOnAction(e -> {
-//            try {
-//                mainApp.showUploadFilesScene();
-//            } catch (IOException ex) {
-//                throw new RuntimeException(ex);
-//            }
-//        });
-//        BackgroundFill backgroundFill0 = new BackgroundFill(color3, radii, new Insets(10));
-//        Background background0 = new Background(backgroundFill0);
-//        toImportSceneButton.setTextFill(Color.BLACK);
-//        toImportSceneButton.setBackground(background0);
-//        toImportSceneButton.setPrefSize(60, 60); // sets both width and height
-//
-//    }
-    // Updates wordbank for autocompleteScene
-    private void updateWordBank(String lastWord, Button[] suggestionFields, TextArea typing, TextArea reportTextArea) {
+    private void updateWordBank(String lastWord, Button[] suggestionFields, TextArea typing) {
         try {
             if (wordService.wordExists(lastWord)) {
                 long id = wordService.getWordId(lastWord);

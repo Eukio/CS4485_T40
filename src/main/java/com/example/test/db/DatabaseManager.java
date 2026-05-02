@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * Central database access class.
  *
@@ -40,6 +41,7 @@ public class DatabaseManager implements AutoCloseable {
         return connection;
     }
 
+    //Christian Verderame
     /**
      * Checks whether a file has already been imported.
      *
@@ -55,7 +57,7 @@ public class DatabaseManager implements AutoCloseable {
             }
         }
     }
-
+    //Christian Verderame
     /**
      * Inserts a row into imported_files, or updates it if the same filename already exists.
      *
@@ -281,7 +283,7 @@ public class DatabaseManager implements AutoCloseable {
         }
     }
 
-
+//Christian Verderame
     /**
      * Combines all details about a word:
      * - its info
@@ -294,6 +296,7 @@ public class DatabaseManager implements AutoCloseable {
         public java.util.List<WordNeighbor> previousWords;
     }
 
+    //Christian Verderame
     /**
      * Finds a word in the database using the TEXT (not id).
      *
@@ -336,7 +339,7 @@ public class DatabaseManager implements AutoCloseable {
         throw new SQLException("Word not found: " + word);
     }
 
-
+    //Christian Verderame
     /**
      * Finds all words that come AFTER the given word.
      *
@@ -378,7 +381,7 @@ public class DatabaseManager implements AutoCloseable {
         return list;
     }
 
-
+    //Christian Verderame
     /**
      * Finds all words that come BEFORE the given word.
      *
@@ -418,7 +421,7 @@ public class DatabaseManager implements AutoCloseable {
         return list;
     }
 
-
+//Christian Verderame
     /**
      * Main function that combines everything.
      *
@@ -448,6 +451,12 @@ public class DatabaseManager implements AutoCloseable {
      * Simple debug function to print everything about a word.
      */
     public String printWordDetails(String word) throws SQLException {
+
+        String[] arrOfStr = word.split(" ");
+        if(arrOfStr.length > 1){
+            return "" + word + " needs to be a single word";
+        }
+
         WordDetails d = getWordDetails(word);
 
         if (d == null) {
@@ -513,8 +522,11 @@ public class DatabaseManager implements AutoCloseable {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
+                String fullFilename = rs.getString("filename");
+                String shortFilename = java.nio.file.Paths.get(fullFilename).getFileName().toString();
+
                 sb.append("File ID: ").append(rs.getLong("id")).append("\n");
-                sb.append("Name: ").append(rs.getString("filename")).append("\n");
+                sb.append("Name: ").append(shortFilename).append("\n");
                 sb.append("Total Words: ").append(rs.getLong("total_words")).append("\n");
                 sb.append("Unique Words: ").append(rs.getLong("unique_words")).append("\n");
                 sb.append("------------------------\n");
@@ -524,7 +536,238 @@ public class DatabaseManager implements AutoCloseable {
         return sb.toString();
     }
 
-//TODO: String that sees a list of all words in the system and information about them
+
+
+
+    //Christian Verderame
+    /**
+     * Returns a string with all files that are duplicates(same name, different path)
+     */
+    public String getDuplicateFileNamesString() throws SQLException {
+
+        String sql = """
+        SELECT 
+            SUBSTRING_INDEX(filename, '\\\\', -1) AS short_name,
+            COUNT(*) AS count,
+            GROUP_CONCAT(filename SEPARATOR '\\n') AS full_paths
+        FROM imported_files
+        GROUP BY short_name
+        HAVING COUNT(*) > 1
+        ORDER BY short_name
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== DUPLICATE FILE NAMES ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                String name = rs.getString("short_name");
+                int count = rs.getInt("count");
+                String paths = rs.getString("full_paths");
+
+                sb.append("File Name: ").append(name).append("\n");
+                sb.append("Occurrences: ").append(count).append("\n");
+                sb.append("Locations:\n").append(paths).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No duplicate file names found.");
+            }
+        }
+
+        return sb.toString();
+    }
+
+//Christian Verderame
+/**
+    gets all words in the database with its count, starting count, and ending count
+ return a string of all the values. Current 50 words max
+
+*/
+
+public String getAllWordsAlphaDESC() throws SQLException {
+
+    String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        WHERE word NOT IN ('[BEGIN]', '[END]')
+        ORDER BY word DESC 
+        LIMIT 300
+    """;
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("=== WORDS IN DATABASE ===\n\n");
+
+    try (PreparedStatement ps = connection.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        boolean found = false;
+
+        while (rs.next()) {
+            found = true;
+
+            long id = rs.getLong("id");
+            String word = rs.getString("word");
+            long total = rs.getLong("total_count");
+            long start = rs.getLong("start_count");
+            long end = rs.getLong("end_count");
+
+            sb.append("ID: ").append(id).append("\n");
+            sb.append("Word: ").append(word).append("\n");
+            sb.append("Total Count: ").append(total).append("\n");
+            sb.append("Start Count: ").append(start).append("\n");
+            sb.append("End Count: ").append(end).append("\n");
+            sb.append("------------------------\n");
+        }
+
+        if (!found) {
+            sb.append("No words found.");
+        }
+    }
+
+    return sb.toString();
+}
+
+    public String getAllWordsAlphaASC() throws SQLException {
+
+        String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        WHERE word NOT IN ('[BEGIN]', '[END]')
+        ORDER BY word 
+        LIMIT 300
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== WORDS IN DATABASE ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                long id = rs.getLong("id");
+                String word = rs.getString("word");
+                long total = rs.getLong("total_count");
+                long start = rs.getLong("start_count");
+                long end = rs.getLong("end_count");
+
+                sb.append("ID: ").append(id).append("\n");
+                sb.append("Word: ").append(word).append("\n");
+                sb.append("Total Count: ").append(total).append("\n");
+                sb.append("Start Count: ").append(start).append("\n");
+                sb.append("End Count: ").append(end).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No words found.");
+            }
+        }
+
+        return sb.toString();
+    }
+
+
+    public String getAllWordsFrequencyDESC() throws SQLException {
+
+        String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        WHERE word NOT IN ('[BEGIN]', '[END]')
+        ORDER BY total_count DESC 
+        LIMIT 300
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== WORDS IN DATABASE ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                long id = rs.getLong("id");
+                String word = rs.getString("word");
+                long total = rs.getLong("total_count");
+                long start = rs.getLong("start_count");
+                long end = rs.getLong("end_count");
+
+                sb.append("ID: ").append(id).append("\n");
+                sb.append("Word: ").append(word).append("\n");
+                sb.append("Total Count: ").append(total).append("\n");
+                sb.append("Start Count: ").append(start).append("\n");
+                sb.append("End Count: ").append(end).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No words found.");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public String getAllWordsFrequencyASC() throws SQLException {
+
+        String sql = """
+        SELECT 
+            id, word, total_count, start_count, end_count
+        FROM words
+        WHERE word NOT IN ('[BEGIN]', '[END]')
+        ORDER BY total_count 
+        LIMIT 300
+    """;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== WORDS IN DATABASE ===\n\n");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            boolean found = false;
+
+            while (rs.next()) {
+                found = true;
+
+                long id = rs.getLong("id");
+                String word = rs.getString("word");
+                long total = rs.getLong("total_count");
+                long start = rs.getLong("start_count");
+                long end = rs.getLong("end_count");
+
+                sb.append("ID: ").append(id).append("\n");
+                sb.append("Word: ").append(word).append("\n");
+                sb.append("Total Count: ").append(total).append("\n");
+                sb.append("Start Count: ").append(start).append("\n");
+                sb.append("End Count: ").append(end).append("\n");
+                sb.append("------------------------\n");
+            }
+
+            if (!found) {
+                sb.append("No words found.");
+            }
+        }
+
+        return sb.toString();
+    }
 
 //TODO: Keep track of what sentences have been generated so your user can look for duplicates
 

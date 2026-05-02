@@ -16,34 +16,56 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.text.TextFlow;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-public class UploadFilesScene extends BorderPane{
+
+//Christian Verderame
+
+
+public class UploadFilesScene extends BorderPane {
+
     private Stage window;
+
+    //  class-level so button can update it
+    private Text fileDetailsText;
+
     public UploadFilesScene(HelloApplication mainApp, Stage window) throws IOException {
         this.window = window;
-        NavBar navBar = new NavBar(mainApp);
-        setTop(navBar);
-        setUploadFilesScene(mainApp);
 
+        NavBar navBar = new NavBar(mainApp, "upload");
+        setTop(navBar);
+
+        setUploadFilesScene(mainApp);
     }
 
-    // SETS the display for uploadFilesScene
-    public void setUploadFilesScene(HelloApplication mainApp) throws IOException {
+    //Christian Verderame
+    /**
+        upload scenes for the file insertion and file history page
 
-        Text welcome0 = new Text("Welcome to_");
+     */
+    public void setUploadFilesScene(HelloApplication mainApp) throws IOException {
+        setStyle("-fx-background-color: white;");
+
+        // Replace the two Text nodes and the VBox with:
+        Text welcome0 = new Text("Upload ");
         welcome0.getStyleClass().add("hero-text");
 
-        Text welcome1 = new Text("Sentence Builder");
+        Text welcome1 = new Text("Files_");
         welcome1.getStyleClass().add("hero-text-accent");
+
+        TextFlow heroText = new TextFlow(welcome0, welcome1);
 
         Label uploadLabel = new Label("Upload your text file here!");
         uploadLabel.getStyleClass().add("upload-label");
 
+        // ================= FILE IMPORT BUTTON =================
         Button importFileButton = new Button("Click Here");
+        importFileButton.setPrefWidth(520);
+        importFileButton.setStyle("-fx-background-radius: 10px;");
 
         BorderStroke outerStroke = new BorderStroke(
                 Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(1)
@@ -52,38 +74,75 @@ public class UploadFilesScene extends BorderPane{
                 Color.BLACK, BorderStrokeStyle.DASHED, new CornerRadii(10), new BorderWidths(1), new Insets(4)
         );
         importFileButton.setBorder(new Border(outerStroke, innerStroke));
-        importFileButton.setBackground(new Background(new BackgroundFill(Color.web("#EDF2FF"), new CornerRadii(10), new Insets(10))));
-        importFileButton.setPrefSize(360, 60);
+
 
         importFileButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose a text file");
+
             fileChooser.getExtensionFilters().add(
                     new FileChooser.ExtensionFilter("Text Files", "*.txt")
             );
+
             File selectedFile = fileChooser.showOpenDialog(window);
+
             if (selectedFile != null) {
                 try {
                     Properties props = ConfigLoader.loadConfig();
+
                     DatabaseConfig config = new DatabaseConfig(
                             props.getProperty("db.jdbcUrl"),
                             props.getProperty("db.username"),
                             props.getProperty("db.password")
                     );
-                    boolean skipAlready = Boolean.parseBoolean(props.getProperty("db.skipAlready"));
+
+                    boolean skipAlready = Boolean.parseBoolean(
+                            props.getProperty("db.skipAlready")
+                    );
+
                     try (DatabaseManager db = new DatabaseManager(config)) {
-                        new BookFolderImporter(db, null).importFile(selectedFile.toPath(), skipAlready);
+                        new BookFolderImporter(db, null)
+                                .importFile(selectedFile.toPath(), skipAlready);
                     }
+
                     uploadLabel.setText("File imported successfully!");
+
                 } catch (Exception ex) {
                     uploadLabel.setText("Import failed: " + ex.getMessage());
                     ex.printStackTrace();
                 }
             }
         });
+        // ================= SHOW DUPLICATES BUTTON =================
+        //TODO: Christian here is your button
+        Button showDuplicatesButton = new Button("Show Duplicates");
 
+        showDuplicatesButton.setOnAction(e -> {
+            try {
+                Properties props = ConfigLoader.loadConfig();
+
+                DatabaseConfig config = new DatabaseConfig(
+                        props.getProperty("db.jdbcUrl"),
+                        props.getProperty("db.username"),
+                        props.getProperty("db.password")
+                );
+
+                try (DatabaseManager db = new DatabaseManager(config)) {
+                    fileDetailsText.setText(db.getDuplicateFileNamesString());
+                }
+
+            } catch (Exception ex) {
+                fileDetailsText.setText("Could not load duplicate file names: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        });
+
+        // ================= NAV BUTTON =================
         Button toWordGeneratorButton = new Button("Continue");
         toWordGeneratorButton.getStyleClass().add("continue-button");
+        toWordGeneratorButton.setStyle("-fx-background-color: " + HelloApplication.DARKNAVY + ";");
+
+
         toWordGeneratorButton.setOnAction(e -> {
             try {
                 mainApp.showAutoCompleteScene();
@@ -92,41 +151,110 @@ public class UploadFilesScene extends BorderPane{
             }
         });
 
-        //TODO: Christian's button
+        // ================= FILE INFO BUTTON =================
         Button showFileDetailsButton = new Button("File Info");
         showFileDetailsButton.getStyleClass().add("continue-button");
 
-        HBox buttonContainer = new HBox(10, toWordGeneratorButton, showFileDetailsButton);
-        VBox box = new VBox(10, welcome0, welcome1, uploadLabel, importFileButton, buttonContainer);
+        // THIS IS THE IMPORTANT PART
+        showFileDetailsButton.setOnAction(e -> {
+            try {
+                Properties props = ConfigLoader.loadConfig();
+
+                DatabaseConfig config = new DatabaseConfig(
+                        props.getProperty("db.jdbcUrl"),
+                        props.getProperty("db.username"),
+                        props.getProperty("db.password")
+                );
+
+                try (DatabaseManager db = new DatabaseManager(config)) {
+                    fileDetailsText.setText(db.getAllFilesStatsString());
+                }
+
+            } catch (Exception ex) {
+                fileDetailsText.setText("Could not load file details: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        });
+
+        // ================= LAYOUT =================
+        HBox buttonContainer = new HBox(10, toWordGeneratorButton, showDuplicatesButton, showFileDetailsButton);
+
+        VBox box = new VBox(
+                10,
+                heroText,
+                uploadLabel,
+                importFileButton,
+                buttonContainer
+        );
+
         box.setPadding(new Insets(10));
 
+        // create pane AFTER field exists
         ScrollPane fileDetailsPane = fileDetailsPane();
-        setRight(fileDetailsPane);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox app = new HBox(box,spacer, fileDetailsPane);
-        app.setSpacing(20);
-        app.setAlignment(Pos.CENTER_LEFT);
-        app.setPadding(new Insets(0, 20, 0, 40));
+        //center the left vbox
+        VBox centerWrapper = new VBox(box);
+        centerWrapper.setAlignment(Pos.CENTER_LEFT);
+        centerWrapper.setPadding(new Insets(0, 20, 0, 72));
 
-        setCenter(app);
+        setCenter(centerWrapper);
+        setRight(fileDetailsPane);
     }
-    //TODO: Christian's scrollPane
-    public ScrollPane fileDetailsPane(){
-        Text fileTitleText = new Text(10, 100, "File Details");
+
+    // ================= RIGHT PANEL =================
+    public ScrollPane fileDetailsPane() {
+
+        Text fileTitleText = new Text("File Details");
         fileTitleText.getStyleClass().add("subtitle-text");
-            Text fileDetailsText = new Text("This is the file details here...");
-            fileDetailsText.setWrappingWidth(280);
-        VBox fileDetailsBox = new VBox(fileTitleText);
-        fileDetailsBox.getChildren().add(fileDetailsText);
+
+        fileDetailsText = new Text("Click 'File Info' to view imported file data.");
+        fileDetailsText.setWrappingWidth(280);
+        fileDetailsText.setStyle("-fx-fill: #1a1a1a; -fx-font-family: 'Verdana'; -fx-font-size: 14px;");
+
+        VBox fileDetailsBox = new VBox(10, fileTitleText, fileDetailsText);
+        fileDetailsBox.setPadding(new Insets(10));
+
         ScrollPane scrollBox = new ScrollPane(fileDetailsBox);
         scrollBox.setPrefViewportWidth(300);
-        scrollBox.setPrefViewportHeight(100);
+        scrollBox.setPrefViewportHeight(320);
         scrollBox.setFitToWidth(true);
         scrollBox.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        scrollBox.setPrefHeight(320);
-        return scrollBox;
+        scrollBox.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background: white;"
+        );
+
+        // Wrap in a panel styled like the history box
+        HBox header = new HBox(fileTitleText);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(4, 8, 4, 8));
+
+        VBox panel = new VBox(4, header, scrollBox);
+        panel.setPadding(new Insets(10));
+        panel.setStyle(
+                "-fx-background-color: #D3DFFF;" +
+                        "-fx-background-radius: 12;"
+        );
+
+        // Wrap panel in a ScrollPane to return correct type
+        ScrollPane wrapper = new ScrollPane(panel);
+        wrapper.setFitToWidth(true);
+        wrapper.setFitToHeight(true); // fills available height
+        wrapper.setPrefViewportWidth(320);
+        wrapper.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-background: transparent;" +
+                        "-fx-border-color: transparent;"
+        );
+
+        scrollBox.setFitToHeight(true);
+        VBox.setVgrow(scrollBox, Priority.ALWAYS);
+        panel.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(panel, Priority.ALWAYS);
+
+        return wrapper;
     }
 }

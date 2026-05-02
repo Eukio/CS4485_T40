@@ -18,37 +18,33 @@ public class HomeScene extends BorderPane {
     }
 
     public void setHomeScene(HelloApplication mainApp) {
-        // ── NavBar ──────────────────────────────────────────────
-        NavBar navBar = new NavBar(mainApp);
+        NavBar navBar = new NavBar(mainApp, "home");
         setTop(navBar);
 
-        // ── Hero text: "Welcome to_" + "Sentence Builder" ───────
         Text welcomeLine = new Text("Welcome to_\n");
-        welcomeLine.setFont(Font.font("SansSerif", FontWeight.NORMAL, 48));
-        welcomeLine.setStyle("-fx-fill: #1a1a1a;");
+        welcomeLine.getStyleClass().add("hero-text");
 
         Text titleLine = new Text("Sentence Builder");
-        titleLine.setFont(Font.font("SansSerif", FontWeight.NORMAL, 48));
-        titleLine.setStyle("-fx-fill: " + HelloApplication.DARKNAVY + ";");
+        titleLine.getStyleClass().add("hero-text-accent");
 
         TextFlow heroText = new TextFlow(welcomeLine, titleLine);
 
         Button startBtn = new Button("Start Here");
+        startBtn.getStyleClass().add("button");
         startBtn.setOnAction(e -> {
             try { mainApp.showUploadFilesScene(); } catch (Exception ex) { ex.printStackTrace(); }
         });
 
-        // ── Footer credit ────────────────────────────────────────
         Text credit = new Text("CS4485_Team40");
-        credit.setStyle("-fx-fill: #aaaaaa; -fx-font-size: 11px;");
+        credit.setStyle("-fx-fill: #aaaaaa; -fx-font-size: 13px;"); // 11 * 1.2
 
-        // ── Layout ───────────────────────────────────────────────
-        VBox centerBox = new VBox(16, heroText, startBtn);
-        centerBox.setPadding(new Insets(40, 0, 0, 48));
+        VBox centerBox = new VBox(29, heroText, startBtn); // 24 * 1.2
+        centerBox.setPadding(new Insets(0, 0, 0, 72)); // 60 * 1.2
+        centerBox.setAlignment(Pos.CENTER_LEFT);
 
         VBox bottomBox = new VBox(credit);
         bottomBox.setAlignment(Pos.BOTTOM_RIGHT);
-        bottomBox.setPadding(new Insets(0, 16, 10, 0));
+        bottomBox.setPadding(new Insets(0, 19, 12, 0)); // 16/10 * 1.2
 
         setCenter(centerBox);
         setBottom(bottomBox);
