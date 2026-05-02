@@ -7,6 +7,8 @@ import com.example.test.db.DatabaseManager;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -14,10 +16,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 
 import java.io.IOException;
+
+import static java.lang.System.out;
 
 public class AutoCompleteScene extends BorderPane {
     WordService wordService;
@@ -73,14 +79,61 @@ public class AutoCompleteScene extends BorderPane {
             }
         });
 
-        typing.setOnKeyReleased(event -> {
-            if (event.getCode() == KeyCode.SPACE) {
+        typing.setOnKeyReleased(event ->{
+            /** fills the word bank with the top 3 autocomplete candidates for the last word typed */
+            if(event.getCode() == KeyCode.SPACE){
                 String text = typing.getText().trim();
-                if (text.isEmpty()) return;
+                if(text.isEmpty()){
+                    return;
+                }
+                //Word extraction for updating old words or adding new words
+                //only update after another word is typed, provide context
+                String[] sentences = text.split("\\.");
+                String regex = "[,\\.\\s]"; //consider adding +
+                String[] words = sentences[sentences.length - 1].trim().split(regex); //get last sentence
+                System.out.println(words.length);
+
+                if (words.length > 1){
+                    System.out.println(words[words.length - 2] + words[words.length - 1]);
+                    //POP-UP EUKI SANDRA WORK ON THIS vvv
+//                    boolean yFlag = true;
+//                    boolean zFlag = true;
+//                    try {
+//                        yFlag = wordService.wordExists(words[words.length - 1]);
+//                        zFlag = wordService.wordExists(words[words.length - 2]);
+//                    } catch (Exception e) {
+//                        System.err.println("Error adding new word: " + e.getMessage());
+//                    }
+//                    if(!yFlag){
+//                        //POP UP?
+//
+//                    }
+//                    if(!zFlag){
+//                        //POP UP?
+//                    }
+//                    //POP-UP EUKI SANDRA WORK ON THIS ^^^
+//
+//                    if(yFlag && zFlag) { //if both words are added to database
+//                        try {
+//                            wordService.newWord(words[words.length - 2], words[words.length - 1]);
+//                        } catch (Exception e) {
+//                            System.err.println("Error adding new word: " + e.getMessage());
+//                        }
+//                    }
+                    try {
+                        wordService.newWord(words[words.length - 2], words[words.length - 1]);
+                    } catch (Exception e) {
+                        System.err.println("Error adding new word: " + e.getMessage());
+                    }
+                } else { //border of sentence... can_start
+
+                }
+
+                //passes last word regardless of punctuation, returns '.' at the end...
                 String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
                 updateWordBank(lastWord, suggestionFields, typing);
-            }
-        });
+            }});
+
 
         setCenter(left);
         setRight(wordBankScroll);
