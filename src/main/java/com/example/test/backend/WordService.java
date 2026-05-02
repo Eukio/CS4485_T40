@@ -158,13 +158,38 @@ public class WordService{
     public boolean wordExists(String word) throws SQLException{
         /** checks if a word exists in the database. */
         return query("SELECT id FROM words WHERE word = ?", resSet -> resSet.next(), word.toLowerCase());
-    }
-    public void newWord(String prev, String curr) throws SQLException{
-        System.out.println(prev + " " + curr);
-        if(wordExists(prev) && wordExists(curr)){
-            // update
-            System.out.println(prev + " exists.");
 
+    }
+
+    public void addWord(String word) throws SQLException{
+        String sql = """
+                            INSERT INTO words (word)
+                            VALUES (?);
+                        """;
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
+            pstmt.setString(1, word);
+            int numUpdate = pstmt.executeUpdate();
+
+            if (numUpdate == 0) {
+                System.out.println("couldn't upload word");
+            }
+            //System.out.println(wordExists(word));
+            //con.commit();
+        }
+    }
+
+    public void newWord(String prev, String curr) throws SQLException{
+        //System.out.println(prev + " " + curr);
+        if(!wordExists(prev)){
+            // update
+
+            addWord(prev);
+            System.out.println(prev + " added.");
+        }
+        if(!wordExists(curr)) {
+            addWord(curr);
+            System.out.println(curr + " added.");
         }
             boolean wordLinkExists = (wordExists(prev) && wordExists(curr)) ? query(
                 """
@@ -178,20 +203,25 @@ public class WordService{
             System.out.println(prev + "->" + curr + " " + (wordLinkExists ? "Exists" : "Does not Exist"));
             if(!wordLinkExists) { //insert wordLink Count
                 String sql = """
-                            INSERT INTO word_links
-                            VALUES (?, ?, 1);
+                            INSERT INTO word_links (word_id, next_word_id)
+                            VALUES (?, ?);
                         """;
                 try (PreparedStatement pstmt = con.prepareStatement(sql)) {
                     // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
-                    pstmt.setString(1, prev);
-                    pstmt.setString(2, curr);
+                    pstmt.setLong(1, getWordId(prev));
+                    pstmt.setLong(2, getWordId(curr));
+                    //System.out.println("DNE, is adding?");
                     int numUpdate = pstmt.executeUpdate();
-
+                    System.out.println(numUpdate);
                     if (numUpdate == 0) {
                         System.out.println(prev + " then " + curr);
                     }
+                } catch (Exception e){
+                    System.out.println(e.getMessage());
                 }
                 System.out.println("added " + prev + "->" + curr);
+                long prevId = getWordId(prev);
+                autocompleteCache.keySet().removeIf(key -> key.wordId() == prevId);
             }else { //update link Count
                 String sql = """
                     UPDATE word_links w1
@@ -209,11 +239,14 @@ public class WordService{
                     }
                 }
                 System.out.println("incremented " + prev + "->" + curr);
-            }
-    }
-}
 
+                long prevId = getWordId(prev);
+                autocompleteCache.keySet().removeIf(key -> key.wordId() == prevId);
+            }
+
+            //con.commit();
     }
+
 
     public String getRandomWord() throws SQLException {
         String sql = "SELECT word FROM words ORDER BY RAND() LIMIT 1";

@@ -121,142 +121,83 @@ public class HelloApplication extends Application {
         applyStylesheet(scene);
         window.setScene(scene);
     }
-    public void createAlgorithmButtons(Button algoButton, Button generateButton, HBox buttons) throws IOException{
-        Color color = Color.web("#c1c8e6");
-        Color color2 = Color.web("#4e60ba");
-        CornerRadii radii = new CornerRadii(10);
 
-        //Algorithm Button
-        BackgroundFill backgroundFill3 = new BackgroundFill(color, radii, new Insets(10));
-        Background background3 = new Background(backgroundFill3);
-        algoButton.setTextFill(color2);
-        algoButton.setBackground(background3);
-        algoButton.setPrefSize(200, 60); // sets both width and height
+//    public void setWordGeneratorScene() throws IOException {
+//        TextField[] suggestionFields = new TextField[suggestions];
+//        Button algoButton = new Button("Algorithm: Greedy"); // expect a lot of mention of whale.
+//        Button generateButton = new Button("Generate Sentence");
+//        Button toImportSceneButton = new Button("<-");
+//        TextField typing = new TextField();
+//        createToImportSceneButton(toImportSceneButton);
+//        ScrollPane wordBankScroll= createRightWordBank(suggestionFields);
+//        wordBankScroll.setFitToWidth(true);
+//        wordBankScroll.setPrefHeight(320);
+//
+//        VBox left = createLeftVBox(algoButton, generateButton,typing);
+//        left.setPadding(new Insets(10));
+//
+//        TextArea outputTextArea = createTextArea();
+//
+//        int maxAlgo = 4; //placeholder for number of algorithms
+//        int[] algorithmOptions = {0};
+//        algoButton.setOnAction(event ->{
+//            algorithmOptions[0] = (algorithmOptions[0] + 1) % maxAlgo;
+//            algoButton.setText("Algorithm: " + algoNames[algorithmOptions[0]]);
+//            String text = typing.getText().trim();
+//            if(!text.isEmpty()){
+//                String lastWord = text.contains(" ") ?
+//                    text.substring(text.lastIndexOf(" ") + 1) : text;
+//                updateWordBank(lastWord, suggestionFields);
+//        }});
+//
+//        generateButton.setOnAction(event -> {
+//            /** Should grab the current text from the typing field, then saves it to the sentence history */
+//            String text = typing.getText().trim();
+//            if(text.isEmpty()){
+//                return;
+//            }try{
+//                String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
+//                out.println("Using algorithm: " + algorithmOptions[0]);
+//                String sentence = new SentenceBuilder(wordService).buildSentence(lastWord, algorithmOptions[0]);
+//                out.println("Generated sentence: " + sentence);
+//                typing.setText(sentence);
+//                SentenceHistory history = new SentenceHistory(dbManager);
+//                history.save(sentence, algoNames[algorithmOptions[0]]);
+//            }catch (Exception e){
+//                System.err.println("Error generating sentence: " + e.getMessage());
+//        }});
+//
+//        typing.setOnKeyReleased(event ->{
+//            /** fills the word bank with the top 3 autocomplete candidates for the last word typed */
+//            if(event.getCode() == KeyCode.SPACE){
+//                String text = typing.getText().trim();
+//                if(text.isEmpty()){
+//                    return;
+//                }
+//                //Word extraction for updating old words or adding new words
+//                //only update after another word is typed, provide context
+//                String regex = "[,\\.\\s]";
+//                String[] words = text.split(regex);
+//                System.out.println(words.length);
+//                if (words.length > 1){
+//                    System.out.println(words[words.length - 2] + words[words.length - 1]);
+//                    try{
+//                        wordService.newWord(words[words.length - 2], words[words.length - 1]);
+//                    }
+//                    catch(Exception e){
+//                        System.err.println("Error adding new word: " + e.getMessage());
+//                    }
+//                }
+//                String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
+//                updateWordBank(lastWord, suggestionFields);
+//        }});
+//
+//        //try hbox as grid
+//        Label mainLabel = new Label("CS4485_Team40");
+//        HBox app = new HBox(toImportSceneButton, left, wordBankScroll, outputTextArea, mainLabel);
+//        app.setAlignment(Pos.CENTER_LEFT);;
+//
+//}
 
-        //Generate Button
-        BackgroundFill backgroundFill2 = new BackgroundFill(color2, radii, new Insets(10));
-        Background background2 = new Background(backgroundFill2);
-        generateButton.setTextFill(Color.WHITE);
-        generateButton.setBackground(background2);
-        generateButton.setPrefSize(200, 60); // sets both width and height
 
-        buttons.setSpacing(10);
-    }
-    public TextArea createTextArea() throws IOException{
-        Color color = Color.web("#c1c8e6");
-        CornerRadii radii = new CornerRadii(10);
-        BackgroundFill backgroundFill = new BackgroundFill(color, radii, Insets.EMPTY);
-        Background background = new Background(backgroundFill);
-        TextArea outputTextArea = new TextArea();
-        outputTextArea.setPrefRowCount(10);
-        outputTextArea.setPrefColumnCount(30);
-        outputTextArea.setWrapText(true);
-        outputTextArea.setPadding(new Insets(10)); //same as Insets(10,10,10,10)
-        outputTextArea.setBackground(background);
-        return outputTextArea;
-    }
-    public void createToImportSceneButton(Button toImportSceneButton) throws IOException{
-        Color color3 = Color.web("#00000040"); //Continue Button
-        CornerRadii radii = new CornerRadii(10);
-        toImportSceneButton.setOnAction(e -> window.setScene(importScene));
-        BackgroundFill backgroundFill0 = new BackgroundFill(color3, radii, new Insets(10));
-        Background background0 = new Background(backgroundFill0);
-        toImportSceneButton.setTextFill(Color.BLACK);
-        toImportSceneButton.setBackground(background0);
-        toImportSceneButton.setPrefSize(60, 60); // sets both width and height
-
-    }
-    public void setWordGeneratorScene() throws IOException {
-        TextField[] suggestionFields = new TextField[suggestions];
-        Button algoButton = new Button("Algorithm: Greedy"); // expect a lot of mention of whale.
-        Button generateButton = new Button("Generate Sentence");
-        Button toImportSceneButton = new Button("<-");
-        TextField typing = new TextField();
-        createToImportSceneButton(toImportSceneButton);
-        ScrollPane wordBankScroll= createRightWordBank(suggestionFields);
-        wordBankScroll.setFitToWidth(true);
-        wordBankScroll.setPrefHeight(320);
-
-        VBox left = createLeftVBox(algoButton, generateButton,typing);
-        left.setPadding(new Insets(10));
-
-        TextArea outputTextArea = createTextArea();
-
-        int maxAlgo = 4; //placeholder for number of algorithms
-        int[] algorithmOptions = {0};
-        algoButton.setOnAction(event ->{
-            algorithmOptions[0] = (algorithmOptions[0] + 1) % maxAlgo;
-            algoButton.setText("Algorithm: " + algoNames[algorithmOptions[0]]);
-            String text = typing.getText().trim();
-            if(!text.isEmpty()){
-                String lastWord = text.contains(" ") ?
-                    text.substring(text.lastIndexOf(" ") + 1) : text;
-                updateWordBank(lastWord, suggestionFields);
-        }});
-
-        generateButton.setOnAction(event -> {
-            /** Should grab the current text from the typing field, then saves it to the sentence history */
-            String text = typing.getText().trim();
-            if(text.isEmpty()){
-                return;
-            }try{
-                String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
-                out.println("Using algorithm: " + algorithmOptions[0]);
-                String sentence = new SentenceBuilder(wordService).buildSentence(lastWord, algorithmOptions[0]);
-                out.println("Generated sentence: " + sentence);
-                typing.setText(sentence);
-                SentenceHistory history = new SentenceHistory(dbManager);
-                history.save(sentence, algoNames[algorithmOptions[0]]);
-            }catch (Exception e){
-                System.err.println("Error generating sentence: " + e.getMessage());
-        }});
-
-        typing.setOnKeyReleased(event ->{
-            /** fills the word bank with the top 3 autocomplete candidates for the last word typed */
-            if(event.getCode() == KeyCode.SPACE){
-                String text = typing.getText().trim();
-                if(text.isEmpty()){
-                    return;
-                }
-                //Word extraction for updating old words or adding new words
-                //only update after another word is typed, provide context
-                String regex = "[,\\.\\s]";
-                String[] words = text.split(regex);
-                System.out.println(words.length);
-                if (words.length > 1){
-                    System.out.println(words[words.length - 2] + words[words.length - 1]);
-                    try{
-                        wordService.newWord(words[words.length - 2], words[words.length - 1]);
-                    }
-                    catch(Exception e){
-                        System.err.println("Error adding new word: " + e.getMessage());
-                    }
-                }
-                String lastWord = text.contains(" ") ? text.substring(text.lastIndexOf(" ") + 1).trim() : text;
-                updateWordBank(lastWord, suggestionFields);
-        }});
-
-        //try hbox as grid
-        Label mainLabel = new Label("CS4485_Team40");
-        HBox app = new HBox(toImportSceneButton, left, wordBankScroll, outputTextArea, mainLabel);
-        app.setAlignment(Pos.CENTER_LEFT);;
-
-}
-
-    private void updateWordBank(String lastWord, TextField[] suggestionFields){
-        // Standard issue helper function -Joshua John
-        try{
-            if(wordService.wordExists(lastWord)){
-                long id = wordService.getWordId(lastWord);
-                var candidates = wordService.getAutocompleteCandidates(id, suggestions);
-                for(int i=0;i<suggestionFields.length;i++){
-                    suggestionFields[i].setText(i < candidates.size() ? candidates.get(i).word() : "");
-                }
-            }else{
-
-            }
-        }catch (Exception e){
-                System.err.println("Error fetching autocomplete candidates: " + e.getMessage());
-                }
-    }
 }
