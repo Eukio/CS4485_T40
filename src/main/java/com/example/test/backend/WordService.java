@@ -161,35 +161,59 @@ public class WordService{
 
     }
 
+    //add or increments
     public void addWord(String word) throws SQLException{
-        String sql = """
+        if(!wordExists(word)){
+            String sql = """
                             INSERT INTO words (word)
                             VALUES (?);
                         """;
+            try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+                // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
+                pstmt.setString(1, word);
+                int numUpdate = pstmt.executeUpdate();
+
+                if (numUpdate == 0) {
+                    System.out.println("couldn't upload word");
+                }
+                //System.out.println(wordExists(word));
+
+            }
+        }
+        String sql = """
+                            UPDATE words
+                            SET total_count = total_count + 1
+                            WHERE id = ?;    
+                        """;
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
             // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
-            pstmt.setString(1, word);
+            pstmt.setLong(1, getWordId(word));
             int numUpdate = pstmt.executeUpdate();
 
             if (numUpdate == 0) {
                 System.out.println("couldn't upload word");
             }
             //System.out.println(wordExists(word));
-            con.commit();
+
         }
+
+        con.commit();
     }
 
+    //REQUIRES BOTH WORDS TO EXIST
     public void newWord(String prev, String curr) throws SQLException{
         //System.out.println(prev + " " + curr);
         if(!wordExists(prev)){
             // update
 
-            addWord(prev);
-            System.out.println(prev + " added.");
+            //addWord(prev);
+            System.out.println(prev + " DNE. LINK fail");
+            return;
         }
         if(!wordExists(curr)) {
-            addWord(curr);
-            System.out.println(curr + " added.");
+            //addWord(curr);
+            System.out.println(curr + " DNE. LINK Fail");
+            return;
         }
             boolean wordLinkExists = (wordExists(prev) && wordExists(curr)) ? query(
                 """
@@ -242,6 +266,13 @@ public class WordService{
 
                 long prevId = getWordId(prev);
                 autocompleteCache.keySet().removeIf(key -> key.wordId() == prevId);
+                //freq test
+                sql = """
+                    SELECT frequency FROM word_links
+                    WHERE word_id = ? AND next_word_id = ?;        
+                """;
+                int freq = query(sql, resSet -> (resSet.next() ? resSet.getInt("frequency") : 0), getWordId(prev.toLowerCase()), getWordId(curr.toLowerCase()));
+                System.out.println(prev + "->" + curr + ": " + freq);
             }
 
             con.commit();
@@ -258,4 +289,63 @@ public class WordService{
         }
         throw new SQLException("No words found in database");
     }
+
+    public void incrementEnd(String word) throws SQLException{
+        if(!wordExists(word)){
+            System.out.println("ERROR END WORD DNE");
+            return;
+        }
+        String sql = """
+                    UPDATE words
+                    SET end_count = end_count + 1
+                    WHERE id = ?;    
+                """;
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
+            pstmt.setLong(1, getWordId(word));
+            int numUpdate = pstmt.executeUpdate();
+
+            if (numUpdate == 0) {
+                System.out.println(word + " can_end incremented" );
+            }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        System.out.println(word + " can_end incremented" );
+
+        long wordId = getWordId(word);
+        autocompleteCache.keySet().removeIf(key -> key.wordId() == wordId);
+        con.commit();
+    }
+
+    //should only be called if wordExists...
+    public void incrementStart(String word) throws SQLException{
+        if(!wordExists(word)){
+            System.out.println("ERROR START WORD DNE");
+            return;
+        }
+        String sql = """
+                    UPDATE words
+                    SET start_count = start_count + 1
+                    WHERE id = ?;    
+                """;
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
+            pstmt.setLong(1, getWordId(word));
+            int numUpdate = pstmt.executeUpdate();
+
+            if (numUpdate == 0) {
+                System.out.println(word + " can_start incremented" );
+            }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        System.out.println(word + " can_start incremented" );
+
+        long wordId = getWordId(word);
+        autocompleteCache.keySet().removeIf(key -> key.wordId() == wordId);
+        con.commit();
+    }
 }
+
+
