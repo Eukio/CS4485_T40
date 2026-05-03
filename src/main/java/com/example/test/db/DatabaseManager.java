@@ -310,7 +310,7 @@ public class DatabaseManager implements AutoCloseable {
         String sql = """
         SELECT id, word, total_count, start_count, end_count, can_start, can_end
         FROM words
-        WHERE word = ?
+        WHERE word = ? AND word NOT IN ('[BEGIN]', '[END]')
     """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -358,7 +358,7 @@ public class DatabaseManager implements AutoCloseable {
         FROM word_links wl
         JOIN words w1 ON wl.word_id = w1.id
         JOIN words w2 ON wl.next_word_id = w2.id
-        WHERE w1.word = ?
+        WHERE w1.word = ? and w2.word NOT IN ('[BEGIN]', '[END]')
         ORDER BY wl.frequency DESC
         LIMIT 10
     """;
@@ -398,7 +398,7 @@ public class DatabaseManager implements AutoCloseable {
         FROM word_links wl
         JOIN words w1 ON wl.word_id = w1.id
         JOIN words w2 ON wl.next_word_id = w2.id
-        WHERE w2.word = ?
+        WHERE w2.word = ? and w2.word NOT IN ('[BEGIN]', '[END]')
         ORDER BY wl.frequency DESC
         LIMIT 10
     """;
