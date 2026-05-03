@@ -227,8 +227,8 @@ public class WordService{
             System.out.println(prev + "->" + curr + " " + (wordLinkExists ? "Exists" : "Does not Exist"));
             if(!wordLinkExists) { //insert wordLink Count
                 String sql = """
-                            INSERT INTO word_links (word_id, next_word_id)
-                            VALUES (?, ?);
+                            INSERT INTO word_links (word_id, next_word_id, frequency)
+                            VALUES (?, ?, 1);
                         """;
                 try (PreparedStatement pstmt = con.prepareStatement(sql)) {
                     // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
