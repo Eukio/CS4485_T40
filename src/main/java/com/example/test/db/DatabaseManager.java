@@ -600,7 +600,7 @@ public String getAllWordsAlphaDESC() throws SQLException {
         FROM words
         WHERE word NOT IN ('[BEGIN]', '[END]')
         ORDER BY word DESC 
-        LIMIT 1000
+        LIMIT 2000
     """;
 
     StringBuilder sb = new StringBuilder();
@@ -644,7 +644,7 @@ public String getAllWordsAlphaDESC() throws SQLException {
         FROM words
         WHERE word NOT IN ('[BEGIN]', '[END]')
         ORDER BY word 
-        LIMIT 1000
+        LIMIT 2000
     """;
 
         StringBuilder sb = new StringBuilder();
@@ -689,7 +689,7 @@ public String getAllWordsAlphaDESC() throws SQLException {
         FROM words
         WHERE word NOT IN ('[BEGIN]', '[END]')
         ORDER BY total_count DESC 
-        LIMIT 1000
+        LIMIT 2000
     """;
 
         StringBuilder sb = new StringBuilder();
@@ -733,7 +733,7 @@ public String getAllWordsAlphaDESC() throws SQLException {
         FROM words
         WHERE word NOT IN ('[BEGIN]', '[END]')
         ORDER BY total_count 
-        LIMIT 1000
+        LIMIT 2000
     """;
 
         StringBuilder sb = new StringBuilder();
