@@ -90,8 +90,20 @@ public class AutoCompleteScene extends BorderPane {
                 //only update after another word is typed, provide context
                 String[] sentences = text.split("\\.");
                 String regex = "[,\\.\\s]"; //consider adding +
+
+
+
                 String[] words = sentences[sentences.length - 1].trim().split(regex); //get last sentence
-                System.out.println(words.length);
+
+                if(words.length > 0){
+                    try{
+                        wordService.addWord(words[words.length - 1]);
+                    }catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
+
+                    System.out.println(" added.");
+                }
 
                 if (words.length > 1){
                     System.out.println(words[words.length - 2] + words[words.length - 1]);
@@ -125,8 +137,24 @@ public class AutoCompleteScene extends BorderPane {
                     } catch (Exception e) {
                         System.err.println("Error adding new word: " + e.getMessage());
                     }
-                } else { //border of sentence... can_start
+                }
 
+                if(words.length == 1){//always check on the start of a sentence
+                    if(sentences.length > 1){ //PREV SENTENCE: check last word increment can end counter
+                        String[] words2 = sentences[sentences.length - 2].trim().split(regex);
+                        try{
+                            wordService.incrementEnd(words2[words2.length - 1]);
+                        }catch(Exception e){
+                            System.out.println("bruh");
+                        }
+                    }
+                    if(sentences.length > 0){ //check first word increment can end counter
+                        try{
+                            wordService.incrementStart(words[0]);
+                        }catch(Exception e){
+                            System.out.println("bruh");
+                        }
+                    }
                 }
 
                 //passes last word regardless of punctuation, returns '.' at the end...
