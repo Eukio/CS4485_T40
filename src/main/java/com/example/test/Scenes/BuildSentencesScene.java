@@ -26,6 +26,11 @@ public class BuildSentencesScene extends BorderPane {
         setBuildSentencesScene(mainApp);
     }
 
+    private String capitalize(String text) {
+        if (text == null || text.isEmpty()) return text;
+        return Character.toUpperCase(text.charAt(0)) + text.substring(1);
+    }
+
     public void setBuildSentencesScene(HelloApplication mainApp) {
 
         // ================= HERO TEXT =================
@@ -130,21 +135,29 @@ public class BuildSentencesScene extends BorderPane {
                 String sentence = new SentenceBuilder(wordService)
                         .buildSentence(lastWord, algorithmOptions[0]);
 
+                // Skip empty or punctuation-only sentences
+                if (sentence == null || sentence.trim().matches("[\\s.!?]+")) {
+                    return;
+                }
+
                 // Remove the seed word from the start of the generated sentence if repeated
                 String trimmedSentence = sentence;
                 if (lastWord != null && sentence.toLowerCase().startsWith(lastWord.toLowerCase())) {
-                    trimmedSentence = sentence.substring(lastWord.length()).trim();
+                    trimmedSentence = capitalize(sentence.substring(lastWord.length()).trim());
+                }
+                // Skip if trimmed result is empty or just punctuation
+                if (trimmedSentence == null || trimmedSentence.trim().matches("[\\s.!?]+")) {
+                    return;
                 }
 
                 if (existing.isEmpty()) {
-                    outputField.setText(sentence);
+                    outputField.setText(capitalize(sentence));
                 } else {
-                    outputField.setText(existing + " " + trimmedSentence);
+                    outputField.setText(capitalize(existing + " " + trimmedSentence));
                 }
 
                 // Add to history
-                String fullText = outputField.getText();
-                Label historyEntry = new Label(fullText);
+                Label historyEntry = new Label(capitalize(trimmedSentence));
                 historyEntry.setWrapText(true);
                 historyEntry.setMaxWidth(Double.MAX_VALUE);
                 historyEntry.setStyle(
