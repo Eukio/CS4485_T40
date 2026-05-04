@@ -26,6 +26,11 @@ public class BuildSentencesScene extends BorderPane {
         setBuildSentencesScene(mainApp);
     }
 
+    private String capitalize(String text) {
+        if (text == null || text.isEmpty()) return text;
+        return Character.toUpperCase(text.charAt(0)) + text.substring(1);
+    }
+
     public void setBuildSentencesScene(HelloApplication mainApp) {
 
         // ================= HERO TEXT =================
@@ -52,12 +57,13 @@ public class BuildSentencesScene extends BorderPane {
             algoButton.setText(algoNames[algorithmOptions[0]]);
         });
 
-        // ================= OUTPUT FIELD (read-only) =================
-        TextArea outputField = new TextArea("Your generated sentence will appear here...");
-        outputField.setEditable(false);
+        // ================= OUTPUT FIELD (editable) =================
+        TextArea outputField = new TextArea();
+        outputField.setPromptText("Type here or generate a sentence...");
+        outputField.setEditable(true);
         outputField.setWrapText(true);
         outputField.setMaxWidth(Double.MAX_VALUE);
-        outputField.setPrefRowCount(2);
+        outputField.setPrefRowCount(3);
         outputField.setStyle(
                 "-fx-background-color: #D3DFFF;" +
                         "-fx-background-radius: 12;" +
@@ -77,7 +83,6 @@ public class BuildSentencesScene extends BorderPane {
                 "-fx-background-color: white;" +
                         "-fx-background: white;"
         );
-        // Start collapsed
         historyScroll.setVisible(false);
         historyScroll.setManaged(false);
 
@@ -87,7 +92,6 @@ public class BuildSentencesScene extends BorderPane {
                         "-fx-font-size: 20px;"
         );
 
-        // Collapse/expand toggle
         final boolean[] expanded = {false};
         Button toggleButton = new Button("Show");
         toggleButton.getStyleClass().add("search-button");
@@ -115,13 +119,45 @@ public class BuildSentencesScene extends BorderPane {
         generateButton.setOnAction(e -> {
             try {
                 WordService wordService = mainApp.getWordService();
-                String sentence = new SentenceBuilder(wordService)
-                        .buildSentence(null, algorithmOptions[0]);
 
-                outputField.setText(sentence);
+                String existing = outputField.getText().trim();
+                String lastWord = null;
+                if (!existing.isEmpty()) {
+                    String cleaned = existing
+                            .replaceAll("\\s*\\[END\\]\\.?$", "")
+                            .replaceAll("[.!?]+$", "")
+                            .trim();
+                    lastWord = cleaned.contains(" ")
+                            ? cleaned.substring(cleaned.lastIndexOf(" ") + 1).trim()
+                            : cleaned;
+                }
+
+                String sentence = new SentenceBuilder(wordService)
+                        .buildSentence(lastWord, algorithmOptions[0]);
+
+                // Skip empty or punctuation-only sentences
+                if (sentence == null || sentence.trim().matches("[\\s.!?]+")) {
+                    return;
+                }
+
+                // Remove the seed word from the start of the generated sentence if repeated
+                String trimmedSentence = sentence;
+                if (lastWord != null && sentence.toLowerCase().startsWith(lastWord.toLowerCase())) {
+                    trimmedSentence = capitalize(sentence.substring(lastWord.length()).trim());
+                }
+                // Skip if trimmed result is empty or just punctuation
+                if (trimmedSentence == null || trimmedSentence.trim().matches("[\\s.!?]+")) {
+                    return;
+                }
+
+                if (existing.isEmpty()) {
+                    outputField.setText(capitalize(sentence));
+                } else {
+                    outputField.setText(capitalize(existing + " " + trimmedSentence));
+                }
 
                 // Add to history
-                Label historyEntry = new Label(sentence);
+                Label historyEntry = new Label(capitalize(trimmedSentence));
                 historyEntry.setWrapText(true);
                 historyEntry.setMaxWidth(Double.MAX_VALUE);
                 historyEntry.setStyle(
