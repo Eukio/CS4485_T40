@@ -24,6 +24,7 @@ import java.util.Properties;
 
 
 //Christian Verderame
+//Sandra, Eucharist  - UI layout
 
 
 public class UploadFilesScene extends BorderPane {
@@ -36,6 +37,7 @@ public class UploadFilesScene extends BorderPane {
     public UploadFilesScene(HelloApplication mainApp, Stage window) throws IOException {
         this.window = window;
 
+        //Sets NavBar
         NavBar navBar = new NavBar(mainApp, "upload");
         setTop(navBar);
 
@@ -207,6 +209,7 @@ public class UploadFilesScene extends BorderPane {
     // ================= RIGHT PANEL =================
     public ScrollPane fileDetailsPane() {
 
+        //Set text to display
         Text fileTitleText = new Text("File Details");
         fileTitleText.getStyleClass().add("subtitle-text");
 
@@ -217,6 +220,7 @@ public class UploadFilesScene extends BorderPane {
         VBox fileDetailsBox = new VBox(10, fileTitleText, fileDetailsText);
         fileDetailsBox.setPadding(new Insets(10));
 
+        // Sandra - Create ScrollPane to display file information
         ScrollPane scrollBox = new ScrollPane(fileDetailsBox);
         scrollBox.setPrefViewportWidth(300);
         scrollBox.setPrefViewportHeight(320);
@@ -227,7 +231,7 @@ public class UploadFilesScene extends BorderPane {
                         "-fx-background: white;"
         );
 
-        // Wrap in a panel styled like the history box
+        // Sandra - Wrap in a panel styled like the history box
         HBox header = new HBox(fileTitleText);
         header.setAlignment(Pos.CENTER_LEFT);
         header.setPadding(new Insets(4, 8, 4, 8));
@@ -239,7 +243,7 @@ public class UploadFilesScene extends BorderPane {
                         "-fx-background-radius: 12;"
         );
 
-        // Wrap panel in a ScrollPane to return correct type
+        // Sandra - Wrap panel in a ScrollPane to return correct type
         ScrollPane wrapper = new ScrollPane(panel);
         wrapper.setFitToWidth(true);
         wrapper.setFitToHeight(true); // fills available height

@@ -27,7 +27,8 @@ import javafx.geometry.Pos;
 
 public class ReportsScene extends BorderPane {
 
-    /*
+    /* Eucharist UI layout
+       Christain connect backend/frontend
      * This text is updated when the user searches for a word.
      * It must be a class variable so searchHBox() can change it.
      */
@@ -45,8 +46,10 @@ public class ReportsScene extends BorderPane {
     private Text wordsText;
 
     public ReportsScene(HelloApplication mainApp) {
+        //Sets NavBar
         NavBar navBar = new NavBar(mainApp, "reports");
         setTop(navBar);
+
         setReportScenePage();
     }
 

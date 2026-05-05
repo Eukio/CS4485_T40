@@ -15,14 +15,17 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+//Sandra - UI connect frontend/backend
 public class BuildSentencesScene extends BorderPane {
 
     private final String[] algoNames = {"Greedy", "Random Weighted", "Temperature", "BPE Markov"};
     private final int[] algorithmOptions = {0};
 
     public BuildSentencesScene(HelloApplication mainApp) {
+        //Sets NavBar
         NavBar navBar = new NavBar(mainApp, "build");
         setTop(navBar);
+
         setBuildSentencesScene(mainApp);
     }
 

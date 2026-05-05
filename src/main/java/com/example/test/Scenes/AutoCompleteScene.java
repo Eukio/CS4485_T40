@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import static java.lang.System.out;
 
+// Sandra, Kaden, Eucharist UI Layout
 public class AutoCompleteScene extends BorderPane {
     WordService wordService;
     DatabaseManager dbManager;
@@ -35,8 +36,11 @@ public class AutoCompleteScene extends BorderPane {
     public AutoCompleteScene(HelloApplication mainApp, WordService wordService, DatabaseManager dbManager) throws IOException {
         this.wordService = wordService;
         this.dbManager = dbManager;
+
+        //Sets NavBar
         NavBar navBar = new NavBar(mainApp, "autocomplete");
         setTop(navBar);
+
         setAutoCompleteScene(mainApp);
     }
 
@@ -44,16 +48,18 @@ public class AutoCompleteScene extends BorderPane {
         setStyle("-fx-background-color: white;");
 
         Button[] suggestionFields = new Button[suggestions];
-
+        //Style Algorithm buttons
         Button algoButton = new Button("Greedy");
         algoButton.getStyleClass().add("algo-button");
         algoButton.setPrefSize(240, 60);
         algoButton.setBackground(new Background(new BackgroundFill(Color.web("#D3DFFF"), new CornerRadii(10), new Insets(10))));
 
+        //Style typing TextArea
         TextArea typing = new TextArea();
         typing.getStyleClass().add("typing-area");
         typing.setPadding(new Insets(12));
 
+        //Create ScrollPane for wordbank
         ScrollPane wordBankScroll = createRightWordBank(suggestionFields);
         wordBankScroll.setFitToWidth(true);
         wordBankScroll.setPrefHeight(320);
@@ -80,7 +86,7 @@ public class AutoCompleteScene extends BorderPane {
         });
 
         typing.setOnKeyReleased(event ->{
-            /** fills the word bank with the top 3 autocomplete candidates for the last word typed */
+            /**Kaden - fills the word bank with the top 3 autocomplete candidates for the last word typed */
             if(event.getCode() == KeyCode.SPACE){
                 String text = typing.getText().trim();
                 if(text.isEmpty()){
@@ -107,7 +113,7 @@ public class AutoCompleteScene extends BorderPane {
 
                 if (words.length > 1){
                     System.out.println(words[words.length - 2] + words[words.length - 1]);
-                    //POP-UP EUKI SANDRA WORK ON THIS vvv
+
 //                    boolean yFlag = true;
 //                    boolean zFlag = true;
 //                    try {
@@ -123,7 +129,6 @@ public class AutoCompleteScene extends BorderPane {
 //                    if(!zFlag){
 //                        //POP UP?
 //                    }
-//                    //POP-UP EUKI SANDRA WORK ON THIS ^^^
 //
 //                    if(yFlag && zFlag) { //if both words are added to database
 //                        try {
@@ -132,6 +137,7 @@ public class AutoCompleteScene extends BorderPane {
 //                            System.err.println("Error adding new word: " + e.getMessage());
 //                        }
 //                    }
+
                     try {
                         wordService.newWord(words[words.length - 2], words[words.length - 1]);
                     } catch (Exception e) {
@@ -171,17 +177,18 @@ public class AutoCompleteScene extends BorderPane {
 //
 //        setCenter(app);
     }
-
+//Sets ScrollPane for word bank
     public ScrollPane createRightWordBank(Button[] suggestionFields) throws IOException {
         Text wordBankTitle = new Text("Next Word");
         wordBankTitle.getStyleClass().add("word-bank-title");
 
+        //Create suggestion buttons for next word
         for (int i = 0; i < suggestions; i++) {
             suggestionFields[i] = new Button();
             suggestionFields[i].setVisible(false);
             suggestionFields[i].getStyleClass().add("suggestion-button");
         }
-
+//Style wordBank
         VBox wordBank = new VBox(wordBankTitle);
         wordBank.getChildren().addAll(suggestionFields);
         wordBank.getStyleClass().add("word-bank");
@@ -192,7 +199,9 @@ public class AutoCompleteScene extends BorderPane {
         return new ScrollPane(wordBank);
     }
 
+//Create left VBox with text, algorithm button, and typing TextArea
     public VBox createLeftVBox(Button algoButton, TextArea typing, HelloApplication mainApp) throws IOException {
+       //Set text to display
         Text welcome0 = new Text("Autocomplete");
         welcome0.getStyleClass().add("hero-text");
 
@@ -204,19 +213,24 @@ public class AutoCompleteScene extends BorderPane {
         Label typingLabel = new Label("Start typing to see your autocomplete suggestions");
         typingLabel.getStyleClass().add("upload-label");
 
+        //Button container
         HBox buttons = new HBox(12, algoButton);
         buttons.setAlignment(Pos.CENTER_LEFT);
 
+        //Create continue button to BuildSentenceScene
         Button toSentenceBuilderButton = new Button("Continue");
         toSentenceBuilderButton.getStyleClass().add("continue-button");
         toSentenceBuilderButton.setStyle("-fx-background-color: " + HelloApplication.DARKNAVY + ";");
         toSentenceBuilderButton.setOnAction(e -> mainApp.showBuildSentencesScene());
 
+        //Set alignment for VBox
         VBox left = new VBox(24, heroText, typingLabel, buttons, typing, toSentenceBuilderButton);
         left.setPadding(new Insets(0, 72, 40, 72));
         left.setAlignment(Pos.CENTER_LEFT);
         return left;
     }
+
+    //Create wordBank to update
     private void updateWordBank(String lastWord, Button[] suggestionFields, TextArea typing) {
         try {
             if (wordService.wordExists(lastWord)) {
