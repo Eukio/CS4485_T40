@@ -446,7 +446,7 @@ public class DatabaseManager implements AutoCloseable {
     }
 
 
-
+    //Christian Verderame
     /**
      * Simple debug function to print everything about a word.
      */
@@ -588,7 +588,7 @@ public class DatabaseManager implements AutoCloseable {
 //Christian Verderame
 /**
     gets all words in the database with its count, starting count, and ending count
- return a string of all the values. Current 50 words max
+ returns a string with id, word, total count, start count, and end count
 
 */
 
@@ -636,6 +636,11 @@ public String getAllWordsAlphaDESC() throws SQLException {
     return sb.toString();
 }
 
+    /**
+     gets all words in the database with its count, starting count, and ending count in alphabetical ascending order
+     returns a string with id, word, total count, start count, and end count
+
+     */
     public String getAllWordsAlphaASC() throws SQLException {
 
         String sql = """
@@ -680,7 +685,11 @@ public String getAllWordsAlphaDESC() throws SQLException {
         return sb.toString();
     }
 
-
+    //Christian Verderame
+    /**
+    Get all words in database in frequency in descending order
+     returns a string with id, word, total count, start count, and end count
+     **/
     public String getAllWordsFrequencyDESC() throws SQLException {
 
         String sql = """
@@ -725,6 +734,11 @@ public String getAllWordsAlphaDESC() throws SQLException {
         return sb.toString();
     }
 
+    //Christian Verderame
+    /**
+     Get all words in database in frequency in ascending order
+     returns a string with id, word, total count, start count, and end count
+     **/
     public String getAllWordsFrequencyASC() throws SQLException {
 
         String sql = """
@@ -769,7 +783,7 @@ public String getAllWordsAlphaDESC() throws SQLException {
         return sb.toString();
     }
 
-//TODO: Keep track of what sentences have been generated so your user can look for duplicates
+
 
 
 }
