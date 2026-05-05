@@ -8,6 +8,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
 public class NavBar extends HBox {
+//Eucharist - UI Navigation Bar that allows user to switch between scenes, is an HBox that is passed between each scene class
 
     private Button activeButton = null;
 
@@ -21,7 +22,7 @@ public class NavBar extends HBox {
         setStyle("-fx-background-color: " + HelloApplication.DARKNAVY + ";");
         setPrefHeight(48);
 
-        // Set active based on which scene we're on
+        // Sandra - Set active based on which scene we're on
         switch (activeScene) {
             case "upload"       -> setActive(upload);
             case "autocomplete" -> setActive(autocomplete);

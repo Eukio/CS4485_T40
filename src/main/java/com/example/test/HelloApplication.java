@@ -23,17 +23,13 @@ import javafx.stage.Stage;
 
 
 public class HelloApplication extends Application {
-
+// Sandra, Eucharist UI layout
     private Stage window;
     private WordService wordService;
     private DatabaseManager dbManager;
 
     public static final String DARKNAVY =  "#466CCC";
-    public static final String SELECTEDNAVY =  "#99AEE2";
-    public static final String FILEUPLOADBLUE =  "#EDF2FF";
     public static final String LIGHTBLUE =  "#D3DFFF";
-    public static final String ADDWORDGRAY = "#C5C5C5";
-    public static final String TEXTGRAY =  "#434343";
 
     private final BPETokenizer[] tokenizer = {null};
     private final BPEMarkovChain[] bpeChain = {null};
@@ -81,7 +77,7 @@ public class HelloApplication extends Application {
     public DatabaseManager getDbManager() {
         return dbManager;
     }
-
+    // Eucharist - Set homeScene upon start, displays window
     public void createWindow(Stage primaryStage){
         window = primaryStage;
         showHomeScene();
@@ -89,15 +85,15 @@ public class HelloApplication extends Application {
         window.show();
     }
 
+    // Sandra - Add styling with css
     private void applyStylesheet(Scene scene) {
         System.out.println("Class location: " + getClass().getProtectionDomain().getCodeSource().getLocation());
 
         String css = getClass().getResource("/com/example/test/styles.css").toExternalForm();
-//        String css = getClass().getResource("styles.css").toExternalForm();
         scene.getStylesheets().add(css);
     }
 
-    // sets display for each scene
+    // Eucharist - sets display by passing created BorderPane class for each Scene, allowing modularity
     public void showHomeScene() {
         Scene scene = new Scene(new HomeScene(this), 1200, 700);
         applyStylesheet(scene);
