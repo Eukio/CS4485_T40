@@ -15,6 +15,7 @@
     import com.example.test.model.ParsedSentence;
     import com.example.test.util.TextPreprocessor;
 
+    //Christian Verderame
     /**
      * Imports every .txt file in a folder into the database.
      *
@@ -41,6 +42,7 @@
             this.progressListener = progressListener;
         }
 
+        //Christian Verderame
         /**
          * Recursively scans a folder for .txt files and imports them one by one.
          *
@@ -75,6 +77,7 @@
             }
         }
 
+        //Christian Verderame
         /**
          * Imports one text file as one database transaction.
          *
@@ -149,6 +152,7 @@
             }
         }
 
+        //Christian Verderame
         /**
          * Builds all statistics required by the assignment from the parsed sentences.
          *
@@ -208,6 +212,7 @@
             return new FileStatistics(counters, transitions, totalWords, sentences.size());
         }
 
+        //Christian Verderame
         /**
          * Bundles all statistics collected for one file.
          */
