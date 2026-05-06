@@ -27,8 +27,8 @@ import javafx.geometry.Pos;
 
 public class ReportsScene extends BorderPane {
 
-    /* Eucharist UI layout
-       Christain connect backend/frontend
+    /* Eucharist UI layout and centering, fixed alignment of objects, designed HBox/VBox containers
+       Christian connect backend/frontend
      * This text is updated when the user searches for a word.
      * It must be a class variable so searchHBox() can change it.
      */
@@ -311,10 +311,12 @@ public class ReportsScene extends BorderPane {
         wordsText.getStyleClass().add("subtitle-text");
         wordsText.setStyle("-fx-font-size: 14px; -fx-font-weight: normal;");
 
+        // Styling for FileDetailsBox
         VBox fileDetailsBox = new VBox(10, wordsText);
         fileDetailsBox.setPadding(new Insets(10));
         fileDetailsBox.setStyle("-fx-background-color: white;");
 
+        // Styling for ScrollBox
         ScrollPane scrollBox = new ScrollPane(fileDetailsBox);
         scrollBox.setPrefViewportHeight(345);
         scrollBox.setFitToWidth(true);

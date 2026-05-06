@@ -16,6 +16,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 //Sandra - UI connect frontend/backend
+// Eucharist - fixed alignment for UI, updated recentering of objects improved class design
+
 public class BuildSentencesScene extends BorderPane {
 
     private final String[] algoNames = {"Greedy", "Random Weighted", "Temperature", "BPE Markov"};
