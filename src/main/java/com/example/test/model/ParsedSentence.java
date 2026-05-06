@@ -2,6 +2,7 @@ package com.example.test.model;
 
 import java.util.List;
 
+//Christian Verderame
 /**
  * Represents one parsed sentence as a list of normalized words.
  *
