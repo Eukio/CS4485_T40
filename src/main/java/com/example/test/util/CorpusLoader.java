@@ -8,7 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+//Christian Verderame
 
+/**
+ * load txt books from the books directoy
+ */
 public class CorpusLoader{
     public static String loadCorpusText(){
         Path booksFolder = Paths.get("src/main/java/com/example/test/books");
