@@ -23,8 +23,9 @@ import java.io.IOException;
 import java.util.Properties;
 
 
-//Christian Verderame
-//Sandra, Eucharist  - UI layout
+//Christian Verderame - File upload, reporting file information, duplicate display
+//Sandra - overall styling for buttons and ScrollPane
+//Eucharist - fixed alignment for UI, created buttons and ScrollPane, improved class design
 
 
 public class UploadFilesScene extends BorderPane {
@@ -220,7 +221,7 @@ public class UploadFilesScene extends BorderPane {
         VBox fileDetailsBox = new VBox(10, fileTitleText, fileDetailsText);
         fileDetailsBox.setPadding(new Insets(10));
 
-        // Sandra - Create ScrollPane to display file information
+        // Eucharist - Create ScrollPane to display file information
         ScrollPane scrollBox = new ScrollPane(fileDetailsBox);
         scrollBox.setPrefViewportWidth(300);
         scrollBox.setPrefViewportHeight(320);

@@ -13,6 +13,7 @@ public class NavBar extends HBox {
     private Button activeButton = null;
 
     public NavBar(HelloApplication mainApp, String activeScene) {
+       // Create buttons
         Button home         = createNavButton("Home");
         Button upload       = createNavButton("Upload Files");
         Button autocomplete = createNavButton("Autocomplete");
@@ -22,7 +23,7 @@ public class NavBar extends HBox {
         setStyle("-fx-background-color: " + HelloApplication.DARKNAVY + ";");
         setPrefHeight(48);
 
-        // Sandra - Set active based on which scene we're on
+        //Sandra - Set active based on which scene we're on
         switch (activeScene) {
             case "upload"       -> setActive(upload);
             case "autocomplete" -> setActive(autocomplete);
@@ -31,6 +32,7 @@ public class NavBar extends HBox {
             default             -> setActive(home);
         }
 
+        //Eucharist - Trigger ActionEvent for each scene to display by calling mainApp
         home.setOnAction(e -> {
             setActive(home); mainApp.showHomeScene();
         });
@@ -51,13 +53,14 @@ public class NavBar extends HBox {
 
         getChildren().addAll(home, upload, autocomplete, build, reports);
     }
-
+    //Create Nav Button with label
     private Button createNavButton(String label) {
         Button btn = new Button(label);
         btn.getStyleClass().add("nav-button");
         return btn;
     }
 
+    //Displays active button when on selected scene
     private void setActive(Button btn) {
         if (activeButton != null) {
             activeButton.getStyleClass().remove("nav-button-active");
