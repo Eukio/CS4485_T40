@@ -25,7 +25,10 @@ import java.io.IOException;
 
 import static java.lang.System.out;
 
-// Sandra, Kaden, Eucharist UI Layout
+// Sandra - Figma design, styling to JavaFx Objects, fixed alignment
+// Eucharist - fixed alignment for UI, updated recentering of objects improved class design
+// Kaden - created base template for JavaFx VBox/HBox
+
 public class AutoCompleteScene extends BorderPane {
     WordService wordService;
     DatabaseManager dbManager;
@@ -97,8 +100,6 @@ public class AutoCompleteScene extends BorderPane {
                 String[] sentences = text.split("\\.");
                 String regex = "[,\\.\\s]"; //consider adding +
 
-
-
                 String[] words = sentences[sentences.length - 1].trim().split(regex); //get last sentence
 
                 if(words.length > 0){
@@ -113,31 +114,6 @@ public class AutoCompleteScene extends BorderPane {
 
                 if (words.length > 1){
                     System.out.println(words[words.length - 2] + words[words.length - 1]);
-
-//                    boolean yFlag = true;
-//                    boolean zFlag = true;
-//                    try {
-//                        yFlag = wordService.wordExists(words[words.length - 1]);
-//                        zFlag = wordService.wordExists(words[words.length - 2]);
-//                    } catch (Exception e) {
-//                        System.err.println("Error adding new word: " + e.getMessage());
-//                    }
-//                    if(!yFlag){
-//                        //POP UP?
-//
-//                    }
-//                    if(!zFlag){
-//                        //POP UP?
-//                    }
-//
-//                    if(yFlag && zFlag) { //if both words are added to database
-//                        try {
-//                            wordService.newWord(words[words.length - 2], words[words.length - 1]);
-//                        } catch (Exception e) {
-//                            System.err.println("Error adding new word: " + e.getMessage());
-//                        }
-//                    }
-
                     try {
                         wordService.newWord(words[words.length - 2], words[words.length - 1]);
                     } catch (Exception e) {
@@ -171,11 +147,6 @@ public class AutoCompleteScene extends BorderPane {
 
         setCenter(left);
         setRight(wordBankScroll);
-//        HBox app = new HBox(left, wordBankScroll);
-//        app.setAlignment(Pos.CENTER);
-//        HBox.setHgrow(left, Priority.ALWAYS);
-//
-//        setCenter(app);
     }
 //Sets ScrollPane for word bank
     public ScrollPane createRightWordBank(Button[] suggestionFields) throws IOException {
