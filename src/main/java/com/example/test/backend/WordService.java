@@ -173,42 +173,37 @@ public class WordService{
 
     }
 
-    //add or increment
-    //Joshua - This function adds the word to the database if the word that was inputted 
-    //doesnt exist in the database, therefore it adds more data along with the word. 
-    //If the word does exist, it runs the prepared update statements to increment the total count.
+    //Kaden - add/increment word to/in database
     public void addWord(String word) throws SQLException{
-        if(!wordExists(word)){
+        if(!wordExists(word)){ //add new word to database w/ init count 0
             String sql = """
                             INSERT INTO words (word)
                             VALUES (?);
                         """;
             try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-                // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
                 pstmt.setString(1, word);
                 int numUpdate = pstmt.executeUpdate();
 
                 if (numUpdate == 0) {
                     System.out.println("couldn't upload word");
                 }
-                //System.out.println(wordExists(word));
 
             }
         }
+
+        //Increment value of word [exists in database]
         String sql = """
                             UPDATE words
                             SET total_count = total_count + 1
                             WHERE id = ?;    
                         """;
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-            // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
             pstmt.setLong(1, getWordId(word));
             int numUpdate = pstmt.executeUpdate();
 
             if (numUpdate == 0) {
                 System.out.println("couldn't upload word");
             }
-            //System.out.println(wordExists(word));
 
         }
 
@@ -216,21 +211,17 @@ public class WordService{
     }
 
     //REQUIRES BOTH WORDS TO EXIST
-    //Joshua - This is the main function that adds a new word link into the DB
+    //Kaden - Add/increment prev->curr to database
     public void newWord(String prev, String curr) throws SQLException{
-        //System.out.println(prev + " " + curr);
-        if(!wordExists(prev)){
-            // update
-
-            //addWord(prev);
+        if(!wordExists(prev)){ //STOP if prev Does not Exist
             System.out.println(prev + " DNE. LINK fail");
             return;
         }
-        if(!wordExists(curr)) {
-            //addWord(curr);
+        if(!wordExists(curr)) {//STOP if curr Does not Exist
             System.out.println(curr + " DNE. LINK Fail");
             return;
         }
+            //CHECK IF prev->curr word_link exists
             boolean wordLinkExists = (wordExists(prev) && wordExists(curr)) ? query(
                 """
                      SELECT EXISTS (
@@ -241,16 +232,14 @@ public class WordService{
                 """
                 , resSet -> (resSet.next() ? resSet.getBoolean(1) : false), getWordId(prev.toLowerCase()), getWordId(curr.toLowerCase())) : false;
             System.out.println(prev + "->" + curr + " " + (wordLinkExists ? "Exists" : "Does not Exist"));
-            if(!wordLinkExists) { //insert wordLink Count
+            if(!wordLinkExists) { //insert wordLink Count if link does not already exist
                 String sql = """
                             INSERT INTO word_links (word_id, next_word_id, frequency)
                             VALUES (?, ?, 1);
                         """;
                 try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-                    // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
                     pstmt.setLong(1, getWordId(prev));
                     pstmt.setLong(2, getWordId(curr));
-                    //System.out.println("DNE, is adding?");
                     int numUpdate = pstmt.executeUpdate();
                     System.out.println(numUpdate);
                     if (numUpdate == 0) {
@@ -260,9 +249,11 @@ public class WordService{
                     System.out.println(e.getMessage());
                 }
                 System.out.println("added " + prev + "->" + curr);
+
+                //update cache for the frontend, to show new words
                 long prevId = getWordId(prev);
                 autocompleteCache.keySet().removeIf(key -> key.wordId() == prevId);
-            }else { //update link Count
+            }else { //increment existing link count prev->curr
                 String sql = """
                     UPDATE word_links w1
                     SET frequency = frequency + 1
@@ -280,6 +271,7 @@ public class WordService{
                 }
                 System.out.println("incremented " + prev + "->" + curr);
 
+                //update cache for the frontend, to show updated rank/preference of words
                 long prevId = getWordId(prev);
                 autocompleteCache.keySet().removeIf(key -> key.wordId() == prevId);
                 //freq test
@@ -306,7 +298,7 @@ public class WordService{
         throw new SQLException("No words found in database");
     }
 
-    //Joshua - Increments the can_end field for the word based on user input (logic handled here)
+    //Kaden - increments can_end
     public void incrementEnd(String word) throws SQLException{
         if(!wordExists(word)){
             System.out.println("ERROR END WORD DNE");
@@ -318,7 +310,6 @@ public class WordService{
                     WHERE id = ?;    
                 """;
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-            // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
             pstmt.setLong(1, getWordId(word));
             int numUpdate = pstmt.executeUpdate();
 
@@ -330,13 +321,14 @@ public class WordService{
         }
         System.out.println(word + " can_end incremented" );
 
+        //update cache to determine words that can end sentence
         long wordId = getWordId(word);
         autocompleteCache.keySet().removeIf(key -> key.wordId() == wordId);
         con.commit();
     }
 
     //should only be called if wordExists...
-    //Joshua - Increments the can_start field for the word based on user input (logic handled here)
+    //Kaden - Increments can_start
     public void incrementStart(String word) throws SQLException{
         if(!wordExists(word)){
             System.out.println("ERROR START WORD DNE");
@@ -348,7 +340,6 @@ public class WordService{
                     WHERE id = ?;    
                 """;
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-            // pstmt.setInt(1, 101); // Set the first parameter (?) to 101
             pstmt.setLong(1, getWordId(word));
             int numUpdate = pstmt.executeUpdate();
 
@@ -360,6 +351,7 @@ public class WordService{
         }
         System.out.println(word + " can_start incremented" );
 
+        //update cache to determine words that can start sentence
         long wordId = getWordId(word);
         autocompleteCache.keySet().removeIf(key -> key.wordId() == wordId);
         con.commit();
