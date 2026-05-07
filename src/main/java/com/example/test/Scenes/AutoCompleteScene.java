@@ -89,20 +89,22 @@ public class AutoCompleteScene extends BorderPane {
         });
 
         typing.setOnKeyReleased(event ->{
-            /**Kaden - fills the word bank with the top 3 autocomplete candidates for the last word typed */
+            /**Kaden - fills the word bank with the top 3 autocomplete candidates for the last word typed
+             * Updates database with new words and word_links, or increments existing words/links
+             * */
             if(event.getCode() == KeyCode.SPACE){
                 String text = typing.getText().trim();
-                if(text.isEmpty()){
+                if(text.isEmpty()){ // skip empty text
                     return;
                 }
                 //Word extraction for updating old words or adding new words
                 //only update after another word is typed, provide context
                 String[] sentences = text.split("\\.");
-                String regex = "[,\\.\\s]"; //consider adding +
+                String regex = "[,\\.\\s]";
 
                 String[] words = sentences[sentences.length - 1].trim().split(regex); //get last sentence
 
-                if(words.length > 0){
+                if(words.length > 0){ //add/increment word to/in database
                     try{
                         wordService.addWord(words[words.length - 1]);
                     }catch (Exception e){
@@ -112,7 +114,7 @@ public class AutoCompleteScene extends BorderPane {
                     System.out.println(" added.");
                 }
 
-                if (words.length > 1){
+                if (words.length > 1){ //Update links between 2 latest words
                     System.out.println(words[words.length - 2] + words[words.length - 1]);
                     try {
                         wordService.newWord(words[words.length - 2], words[words.length - 1]);
@@ -121,8 +123,8 @@ public class AutoCompleteScene extends BorderPane {
                     }
                 }
 
-                if(words.length == 1){//always check on the start of a sentence
-                    if(sentences.length > 1){ //PREV SENTENCE: check last word increment can end counter
+                if(words.length == 1){//check start of a sentence for can_start and can_end
+                    if(sentences.length > 1){ //PREV SENTENCE: check last word increment can_end counter
                         String[] words2 = sentences[sentences.length - 2].trim().split(regex);
                         try{
                             wordService.incrementEnd(words2[words2.length - 1]);
@@ -130,7 +132,7 @@ public class AutoCompleteScene extends BorderPane {
                             System.out.println("bruh");
                         }
                     }
-                    if(sentences.length > 0){ //check first word increment can end counter
+                    if(sentences.length > 0){ //CURR SENTENCE: check first word increment can_start counter
                         try{
                             wordService.incrementStart(words[0]);
                         }catch(Exception e){
