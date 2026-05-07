@@ -69,11 +69,12 @@ public class HelloApplication extends Application {
         }
 
     }
-
+    //Joshua - Getters for wordservice 
     public WordService getWordService() {
         return wordService;
     }
 
+    //Joshua - Getter for database manager
     public DatabaseManager getDbManager() {
         return dbManager;
     }
