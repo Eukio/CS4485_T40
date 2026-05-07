@@ -13,6 +13,7 @@ import com.example.test.db.DatabaseManager;
 
 public class WordService{
     private final Connection con;
+     // Joshua - Initalizing wordService with Christians Database object. 
     public WordService(DatabaseManager dbManager){
         /**standard issue connection */
         this.con = dbManager.connection();
@@ -35,7 +36,7 @@ public class WordService{
     private final Map<AutoCompleteKey, List<WordCandidate>> autocompleteCache = new ConcurrentHashMap<>();
 
     
-
+     // Joshua - helper method to reduce boilerplate for queries. It uses prepared statemnets and has it. 
     private <T> T query(String sql, ResultSetHandler<T> handler, Object... params) throws SQLException{
         /** This guy is the NOT lambda part. It handles all the annoying JDBC stuff.
          * It just throws the query, and then it passes the result set to the lambda to handle.
@@ -63,17 +64,20 @@ public class WordService{
         }, word.toLowerCase());
     }
 
-
+    //Joshua - Simple getter method to check if the word can end
     public boolean canEnd(long wordId) throws SQLException{
         /** searches the database for the word's ID and it checksthe column if it can end, and if it is true returns true. else false. */
         return query("SELECT can_end FROM words WHERE id = ?", resSet -> resSet.next() && resSet.getBoolean("can_end"), wordId);
     }
-
+    //Joshua - Simple getter method to check if the word can start
     public boolean canStart(long wordId) throws SQLException{
         /** same thing as canEnd but for the can_start column. Because i'm lazy */
         return query("SELECT can_start FROM words WHERE id = ?", resSet -> resSet.next() && resSet.getBoolean("can_start"), wordId);
     }
 
+    //Joshua - the Main function that prepares the SQL statement, and passes it into the lambda function to handle the result.
+    // The lambda function splits the result into a record based on next_word_id, word, and frequency. 
+    // and then it adds that record to a list of WordCandidates, which is then returned as the result of the whole function.
     public List<WordCandidate> getNextWord(long wordId) throws SQLException{
         /** Gets the next words in the sequence */
         String sql = """
@@ -92,6 +96,10 @@ public class WordService{
         }, wordId);
     }
 
+
+    //Joshua - same as getNextWord but for the previous words in the sequence. 
+    // I just flipped the SQL statement to look for next_word_id instead of word_id.
+    //Then I flipped the order of the results to be based on frequency of the previous word instead of the next word.
     public List<WordCandidate> getPreviousWord(long wordId) throws SQLException{
         /** same as getNextWord but for the previous words in the sequence */
         String sql = """
@@ -110,6 +118,8 @@ public class WordService{
         }, wordId);
     }
 
+    //Joshua - This is the method that gets the autocomplete candidates based on a prefix.
+    // It uses a cache to store the results of previous queries, so if the same query is made again, it can be returned from the cache.
     public List<WordCandidate> getAutocompleteCandidates(long wordId, int limit) throws SQLException{
         /** Gets autocomplete candidates based on a prefix */
         AutoCompleteKey key = new AutoCompleteKey(wordId, limit);
@@ -144,6 +154,7 @@ public class WordService{
         return result;
     }
 
+    //Joshua - Simple getter method to get the word based on ID. 
     public String getWordById(long wordId) throws SQLException{
         /** Gets a word by its ID. */
         String sql = "SELECT word FROM words WHERE id = ?";
@@ -155,13 +166,17 @@ public class WordService{
         }, wordId);
     }
 
+    // Joshua - Simple boolean function, that gets the word based on input. 
     public boolean wordExists(String word) throws SQLException{
         /** checks if a word exists in the database. */
         return query("SELECT id FROM words WHERE word = ?", resSet -> resSet.next(), word.toLowerCase());
 
     }
 
-    //add or increments
+    //add or increment
+    //Joshua - This function adds the word to the database if the word that was inputted 
+    //doesnt exist in the database, therefore it adds more data along with the word. 
+    //If the word does exist, it runs the prepared update statements to increment the total count.
     public void addWord(String word) throws SQLException{
         if(!wordExists(word)){
             String sql = """
@@ -201,6 +216,7 @@ public class WordService{
     }
 
     //REQUIRES BOTH WORDS TO EXIST
+    //Joshua - This is the main function that adds a new word link into the DB
     public void newWord(String prev, String curr) throws SQLException{
         //System.out.println(prev + " " + curr);
         if(!wordExists(prev)){
@@ -278,7 +294,7 @@ public class WordService{
             con.commit();
     }
 
-
+    //Joshua - A Helper function that gets a random word for the random word generation (for the sentence builder).
     public String getRandomWord() throws SQLException {
         String sql = "SELECT word FROM words ORDER BY RAND() LIMIT 1";
         try (var stmt = con.prepareStatement(sql);
@@ -290,6 +306,7 @@ public class WordService{
         throw new SQLException("No words found in database");
     }
 
+    //Joshua - Increments the can_end field for the word based on user input (logic handled here)
     public void incrementEnd(String word) throws SQLException{
         if(!wordExists(word)){
             System.out.println("ERROR END WORD DNE");
@@ -319,6 +336,7 @@ public class WordService{
     }
 
     //should only be called if wordExists...
+    //Joshua - Increments the can_start field for the word based on user input (logic handled here)
     public void incrementStart(String word) throws SQLException{
         if(!wordExists(word)){
             System.out.println("ERROR START WORD DNE");

@@ -3,22 +3,22 @@ package com.example.test;
 import java.io.IOException;
 import java.util.Properties;
 
-import com.example.test.Scenes.*;
+import com.example.test.Scenes.AutoCompleteScene;
+import com.example.test.Scenes.BuildSentencesScene;
+import com.example.test.Scenes.HomeScene;
+import com.example.test.Scenes.ReportsScene;
+import com.example.test.Scenes.UploadFilesScene;
 import com.example.test.backend.BPEMarkovChain;
 import com.example.test.backend.BPETokenizer;
 import com.example.test.backend.SentenceBuilder;
 import com.example.test.backend.WordService;
-
 import com.example.test.db.DatabaseConfig;
 import com.example.test.db.DatabaseManager;
-
 import com.example.test.util.ConfigLoader;
 import com.example.test.util.CorpusLoader;
 
 import javafx.application.Application;
-
 import javafx.scene.Scene;
-
 import javafx.stage.Stage;
 
 
@@ -44,7 +44,7 @@ public class HelloApplication extends Application {
         configDatabase();
         createWindow(primaryStage);
     }
-
+     // Joshua - Setup the database config to connect to our backend from the frontend. 
     public void configDatabase(){
         try{
             Properties props = ConfigLoader.loadConfig();

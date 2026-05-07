@@ -2,13 +2,14 @@
 //SentenceHistory.java
 package com.example.test.backend;
 
-import com.example.test.db.DatabaseManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.test.db.DatabaseManager;
 
 public class SentenceHistory{
     private final Connection con;
@@ -24,6 +25,9 @@ public class SentenceHistory{
         T handle(ResultSet resSet) throws SQLException;
     }
 
+    //Joshua - I also stole this function from my WordService class
+    //it's a helper function to run prepared statements and handle the result set with a lambda function. 
+    // It just abstracts away some of the boilerplate code for running queries.
     private <T> T query(String sql, ResultSetHandler<T> handler, Object... params) throws SQLException{
         try(PreparedStatement prepStat = con.prepareStatement(sql)){
             for(int i=0; i<params.length;i++){
@@ -33,7 +37,7 @@ public class SentenceHistory{
                 return handler.handle(resSet);
     }}}
 
-
+    //Stores the sentence into the DB, along with the algorithm used to generate it.
     public void save(String sentence, String algo) throws SQLException{
         /** Saves a generated sentence to the database. */
         String sql = "INSERT INTO generated_sentences(sentence, algorithm) VALUES (?, ?)";
@@ -43,11 +47,13 @@ public class SentenceHistory{
             ps.executeUpdate();
     }}
 
+    //Joshua - Checks if the sentence that was generated already exists in the DB.
     public boolean isDuplicate(String sentence) throws SQLException{
         /** Checks if an identical sentence has been generated before. */
         return query("SELECT 1 FROM generated_sentences WHERE sentence = ? LIMIT 1", resSet -> resSet.next(), sentence);
     }
-
+    
+    // - Joshua - Gets all the generated sentences from the DB, ordered by most recent first.
     public List<GeneratedSentence> getAll() throws SQLException{
         /** Returns all generated sentences, most recent first. */
         String sql = """
@@ -69,6 +75,7 @@ public class SentenceHistory{
         });
     }
 
+    //Joshua - Gets the sentences that have been generated more than once, ordered by most common first.
     public List<String> getDuplicates() throws SQLException{
         /** Returns sentences that have been generated more than once. */
         String sql = """
