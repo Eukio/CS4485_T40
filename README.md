@@ -52,7 +52,30 @@ Prerequisites:
 mysql -u <user> -p < src/main/resources/schema.sql
 ```
 
-2. Edit `configsql.properties` (root of project) and set `db.jdbcUrl`, `db.username`, `db.password` and any other settings. See [configsql.properties](configsql.properties).
+2. Create `configsql.properties` in the project root from the example file [configsql.example.properties](configsql.example.properties).
+
+Required config keys (4):
+
+```properties
+db.jdbcUrl=jdbc:mysql://localhost:3306/sentence_builder
+db.username=app_user
+db.password=change_me_secure_password
+db.folderPath=src/main/java/com/example/test/books
+```
+
+Optional key:
+
+```properties
+db.skipAlreadyImported=true
+```
+
+Windows copy command (run from project root):
+
+```powershell
+Copy-Item .\configsql.example.properties .\configsql.properties
+```
+
+Then open `configsql.properties` and update `db.username` and `db.password` to match your MySQL account.
 
 3. Build and run with the included Maven wrapper (Windows example):
 
